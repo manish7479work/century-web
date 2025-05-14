@@ -1,0 +1,17 @@
+/* Apply globally or to a specific element */
+::-webkit-scrollbar {
+    width: 3px;
+    /* Vertical scrollbar */
+    height: 4px;
+    /* Horizontal scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+    /* or any color */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #f16a6a;
+    border-radius: 50px;
+}
