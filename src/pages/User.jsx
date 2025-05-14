@@ -254,7 +254,7 @@ const User = () => {
                 ...prevColumns,
                 {
                     field: fieldName,
-                    headerName: fieldName.toUpperCase(),
+                    headerName: fieldName.charAt(0).toUpperCase() + fieldName.slice(1),
                     width: 120, // width should be a number, not a string
                     renderCell: (params) => {
                         const isActive = params.value === "Active";
@@ -284,7 +284,7 @@ const User = () => {
                 ...prevColumns,
                 {
                     field: fieldName,
-                    headerName: fieldName.toUpperCase(),
+                    headerName: fieldName.charAt(0).toUpperCase() + fieldName.slice(1),
                     width: "120",
                     renderCell: (params) => {
                         const currentStatus = params.row.status;
