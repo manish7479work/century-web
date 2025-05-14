@@ -13,6 +13,8 @@ import { IoToday } from "react-icons/io5";
 import MyDatePicker from '../components/Form/MyDatePicker';
 import { Input } from '@mui/joy';
 import ChatPromptChart from '../components/ChatPromptChart';
+import { BarChart, CartesianGrid, Legend, Treemap, XAxis, YAxis, Bar, Tooltip } from 'recharts';
+import MyBarChart from '../components/MyBarChart';
 
 
 const KPI_DATA = [
@@ -71,30 +73,17 @@ const Overview = () => {
     return (
         <div className='h-full flex flex-col gap-2'>
             <Breadcrumbs />
-
-            {/* KPI */}
-            <div className='flex gap-10'>
-                {
-                    kpiData.map((kpi, idx) => {
-                        return < KPI key={idx} title={kpi.title} value={kpi.value} icon={kpi.icon} />
-                    })
-                }
-            </div>
-
             <div className='h-full overflow-auto flex gap-2 flex-col'>
+                <div className='flex gap-2'>
+                    {/* <Tree /> */}
+                    {/* <BarData /> */}
+                    <MyBarChart title={"Usage"} />
+                    <MyBarChart title={"Unique User Visitor"} />
+                    <MyBarChart title={"Error Rate"} />
 
-                <div className='w-full flex gap-2'>
-                    <div className='w-[450px]'>
-                        <ChatPromptChart />
-                    </div>
-
-                    <div className='flex-1'>
-                        <ChatPromptChart />
-                    </div>
                 </div>
                 <div className='flex flex-col gap-2'>
                     <Filter searchtext={searchtext} setsearchtext={setsearchtext} setDateRange={setDateRange} />
-
                     <Table DATA={filteredData} />
                 </div>
             </div>
@@ -189,4 +178,226 @@ const Filter = ({ searchtext, setsearchtext = () => { } }) => {
         </div>
     )
 }
+
+
+
+// ***************************************************************************
+
+const Tree = () => {
+    const data = [
+        {
+            "name": "axis",
+            "children": [
+                {
+                    "name": "Axis",
+                    "size": 24593
+                },
+                {
+                    "name": "Axes",
+                    "size": 1302
+                },
+                {
+                    "name": "test",
+                    "size": 652
+                },
+                {
+                    "name": "AxisLabel",
+                    "size": 636
+                },
+                {
+                    "name": "CartesianAxes",
+                    "size": 6703
+                }
+            ]
+        },
+        {
+            "name": "controls",
+            "children": [
+                {
+                    "name": "TooltipControl",
+                    "size": 8435
+                },
+                {
+                    "name": "SelectionControl",
+                    "size": 7862
+                },
+                {
+                    "name": "PanZoomControl",
+                    "size": 5222
+                },
+                {
+                    "name": "HoverControl",
+                    "size": 4896
+                },
+                {
+                    "name": "ControlList",
+                    "size": 4665
+                },
+                {
+                    "name": "ClickControl",
+                    "size": 3824
+                },
+                {
+                    "name": "ExpandControl",
+                    "size": 2832
+                },
+                {
+                    "name": "DragControl",
+                    "size": 2649
+                },
+                {
+                    "name": "AnchorControl",
+                    "size": 2138
+                },
+                {
+                    "name": "Control",
+                    "size": 1353
+                },
+                {
+                    "name": "IControl",
+                    "size": 763
+                }
+            ]
+        },
+        {
+            "name": "data",
+            "children": [
+                {
+                    "name": "Data",
+                    "size": 20544
+                },
+                {
+                    "name": "NodeSprite",
+                    "size": 19382
+                },
+                {
+                    "name": "DataList",
+                    "size": 19788
+                },
+                {
+                    "name": "DataSprite",
+                    "size": 10349
+                },
+                {
+                    "name": "EdgeSprite",
+                    "size": 3301
+                },
+                {
+                    "name": "render",
+                    "children": [
+                        {
+                            "name": "EdgeRenderer",
+                            "size": 5569
+                        },
+                        {
+                            "name": "ShapeRenderer",
+                            "size": 2247
+                        },
+                        {
+                            "name": "ArrowType",
+                            "size": 698
+                        },
+                        {
+                            "name": "IRenderer",
+                            "size": 353
+                        }
+                    ]
+                },
+                {
+                    "name": "ScaleBinding",
+                    "size": 11275
+                },
+                {
+                    "name": "TreeBuilder",
+                    "size": 9930
+                },
+                {
+                    "name": "Tree",
+                    "size": 7147
+                }
+            ]
+        },
+        {
+            "name": "events",
+            "children": [
+                {
+                    "name": "DataEvent",
+                    "size": 7313
+                },
+                {
+                    "name": "SelectionEvent",
+                    "size": 6880
+                },
+                {
+                    "name": "TooltipEvent",
+                    "size": 3701
+                },
+                {
+                    "name": "VisualizationEvent",
+                    "size": 2117
+                }
+            ]
+        },
+
+    ]
+
+    return (
+        <Treemap
+            width={1000}
+            height={550}
+            data={data}
+            dataKey="size"
+            aspectRatio={2 / 3}
+            stroke="#fff"
+            fill="#8884d8"
+        />
+    )
+}
+
+
+const BarData = () => {
+    const data = [
+        {
+            "name": "Page A",
+            "user visitor": 4000,
+        },
+        {
+            "name": "Page B",
+            "user visitor": 3000,
+        },
+        {
+            "name": "Page C",
+            "user visitor": 2000,
+        },
+        {
+            "name": "Page D",
+            "user visitor": 2780,
+        },
+        {
+            "name": "Page E",
+            "user visitor": 1890,
+        },
+        {
+            "name": "Page F",
+            "user visitor": 2390,
+        },
+        {
+            "name": "Page G",
+            "user visitor": 7490,
+        }
+    ]
+
+    return (
+        <BarChart width={430} height={250} data={data}>
+            <CartesianGrid strokeDasharray="3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {/* <Bar dataKey="pv" fill="#8884d8" /> */}
+            <Bar dataKey="user visitor" fill="#82ca9d" />
+        </BarChart>
+    )
+}
+
 
