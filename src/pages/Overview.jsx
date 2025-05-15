@@ -15,6 +15,8 @@ import { Input } from '@mui/joy';
 import ChatPromptChart from '../components/ChatPromptChart';
 import { BarChart, CartesianGrid, Legend, Treemap, XAxis, YAxis, Bar, Tooltip } from 'recharts';
 import MyBarChart from '../components/MyBarChart';
+import Select from 'react-select';
+
 
 
 const KPI_DATA = [
@@ -46,7 +48,7 @@ const Overview = () => {
     const [searchtext, setsearchtext] = useState("")
     const [rows, setRows] = useState(USER_CHAT_DATA)
     const [dateRange, setDateRange] = useState([]);
-    const [name, setName] = useState([])
+    const [period, setPeriod] = useState("day")
 
     let filteredData = dateRange.length > 0
         ? rows.filter((asset) => {
@@ -70,20 +72,35 @@ const Overview = () => {
         return matchesSearch;
     });
 
+    const options = [
+        {
+            "label": "Day",
+            "value": "day"
+        },
+        {
+            "label": "Month",
+            "value": "month"
+        }
+    ]
+
+    const selectedOption = options.find(option => option.value === period) || null;
+
+
     return (
         <div className='h-full flex flex-col gap-2'>
             <Breadcrumbs />
+            <Filter options={options} selectedOption={selectedOption} setPeriod={setPeriod} />
             <div className='h-full overflow-auto flex gap-2 flex-col'>
                 <div className='flex gap-2'>
                     {/* <Tree /> */}
                     {/* <BarData /> */}
-                    <MyBarChart title={"Usage"} />
-                    <MyBarChart title={"Unique User Visitor"} />
-                    <MyBarChart title={"Error Rate"} />
+                    <MyBarChart title={"Usage"} period={period} />
+                    <MyBarChart title={"Unique Visitor"} period={period} />
+                    {/* <MyBarChart title={"Error Rate"} /> */}
 
                 </div>
                 <div className='flex flex-col gap-2'>
-                    <Filter searchtext={searchtext} setsearchtext={setsearchtext} setDateRange={setDateRange} />
+                    {/* <Filter searchtext={searchtext} setsearchtext={setsearchtext} setDateRange={setDateRange} /> */}
                     <Table DATA={filteredData} />
                 </div>
             </div>
@@ -154,30 +171,52 @@ const Table = ({ DATA }) => {
         <>
             <MyDataGrid rows={rows} columns={columns} />
             <MyModel openModal={openModal} setOpenModal={setOpenModal} title={title} RENDER_COMPONENT={<MyChat chatData={chatData} />} />
-
         </>
     )
 }
 
-const Filter = ({ searchtext, setsearchtext = () => { } }) => {
+const Filter = ({ options = [], selectedOption = () => { }, setPeriod = "", setDateRange = () => { } }) => {
     return (
-        <div className='w-full flex gap-2'>
-            <Input
-                placeholder="Search..."
-                variant="outlined"
-                className="w-full"
-                onChange={(e) => {
-                    setsearchtext(e.target.value);
+        <div className='w-full flex gap-2 justify-evenly'>
+            <Select
+                isMulti={false}
+                value={selectedOption}
+                onChange={(selectedOption) => {
+                    const selectedValue = selectedOption?.value || "";
+                    setPeriod(selectedValue);
                 }}
-                // sx={{ padding: "8px" }}
-                value={searchtext}
+                closeMenuOnSelect={true}
+                placeholder="Select Period"
+                className="basic-multi-select w-full"
+                classNamePrefix="select"
+                options={options}
+                isClearable={true} // Optional: Adds built-in clear (x) button
             />
-            <div className='w-[550px]'>
-                <MyDatePicker />
-            </div>
+
+            <MyDatePicker setDateRange={setDateRange} />
         </div>
     )
 }
+
+// const Filter = ({ searchtext, setsearchtext = () => { } }) => {
+//     return (
+//         <div className='w-full flex gap-2'>
+//             <Input
+//                 placeholder="Search..."
+//                 variant="outlined"
+//                 className="w-full"
+//                 onChange={(e) => {
+//                     setsearchtext(e.target.value);
+//                 }}
+//                 // sx={{ padding: "8px" }}
+//                 value={searchtext}
+//             />
+//             <div className='w-[550px]'>
+//                 <MyDatePicker />
+//             </div>
+//         </div>
+//     )
+// }
 
 
 
