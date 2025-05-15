@@ -76,7 +76,7 @@ const CustomSidebar = ({ sidebarData }) => {
                 })}
             </Menu>
 
-            <div className='absolute bottom-0 w-full flex justify-center  mb-2'>
+            <div className='absolute bottom-0 w-full flex justify-end pr-3  mb-2'>
                 <AvatarWthName name={logedInUserName} isCollapsed={isCollapsed} />
             </div>
 
