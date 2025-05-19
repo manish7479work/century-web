@@ -7,6 +7,8 @@ import Select from 'react-select'
 import { toast } from 'react-toastify'
 import Breadcrumbs from '../components/Breadcrumb/Breadcrumb'
 import { Input } from '@mui/joy'
+import axiosInstance from '../api/axios'
+import Loading from '../components/Loading'
 "react-select"
 
 const USER_DATA = [
@@ -238,11 +240,24 @@ const USER_DATA = [
     // Continue up to id 50 similarly
 ]
 
+const INITIAL_COLUMNS = [
+    {
+        field: "name",
+        headerName: "Name",
+        width: 200
+    },
+    {
+        field: "territory_code",
+        headerName: "Territory Code",
+        width: 150
+    }
+]
+
 const User = () => {
-    const [rows, setRows] = useState(USER_DATA)
+    const [rows, setRows] = useState([])
     const [columns, setColumns] = useState(extractColumns(USER_DATA, ["id", "status"]))
     const [searchtext, setsearchtext] = useState("")
-
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         const fieldName = "status";
@@ -312,6 +327,49 @@ const User = () => {
         });
     }, []);
 
+    // fetch User data
+    useEffect(() => {
+        const fetchUser = async () => {
+            const URL = "/get_admin_users"
+            try {
+                setLoading(true)
+                const bodyData = {
+                    "pno": "9876543210",
+                    "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6"
+                }
+                const { data } = await axiosInstance.post(URL, bodyData)
+                const { users } = data
+                console.log(users)
+                setRows(users)
+                // setColumns(extractColumns(users))
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setLoading(false)
+            }
+        };
+        fetchUser();
+    }, []);
+
+    console.log(rows)
+
+    const updateStatus = async (userId, status) => {
+        try {
+            const URL = "/users"
+            setLoading(true)
+            const bodyData = {
+                userId,
+                status
+            }
+            const { data } = await axiosInstance.put(URL, bodyData)
+            setRows(data.users)
+        } catch (error) {
+            throw new Error(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const filteredData = rows.filter((item) => {
         const matchesSearch =
             !searchtext ||
@@ -325,22 +383,30 @@ const User = () => {
         return matchesSearch;
     });
 
-    const clickHandle = (id, status) => {
+    const clickHandle = async (id, status) => {
         const isConfirm = confirm("Do you really want to change the status ?" + id + status)
         if (isConfirm) {
-            const updatedRow = rows.map((row) => {
-                if (row.id === id) {
-                    row.status = status;
-                }
-                return row;
-            })
-            toast.success("Status updated sucessfully...")
-            setRows(updatedRow)
+            try {
+                await updateStatus(id, status)
+
+                const updatedRows = rows.map((row) =>
+                    row.id === id ? { ...row, status } : row
+                );
+                setRows(updatedRows);
+
+                toast.success("Status updated sucessfully...")
+            } catch (error) {
+                console.log(error)
+                toast.error("Something went wrong!")
+            }
+
+
         }
     }
 
     return (
         <div className='h-full w-full overflow-auto flex flex-col gap-2'>
+            {loading && <Loading />}
             <Breadcrumbs />
             <Input
                 placeholder="Search..."

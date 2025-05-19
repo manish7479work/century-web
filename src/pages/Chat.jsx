@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { extractColumns } from '../utils/helper';
+import { convertToISO, extractColumns } from '../utils/helper';
 import Select from 'react-select';
 import DataGridWithPadding from '../components/Form/DataGridWithPadding';
 import { DatePicker } from "antd";
@@ -9,65 +9,59 @@ import Breadcrumbs from '../components/Breadcrumb/Breadcrumb';
 import MyDatePicker from '../components/Form/MyDatePicker';
 import { CHAT_DATA } from '../data';
 import axiosInstance from '../api/axios';
-import { toast } from 'react-toastify';
-import axios from 'axios';
 import Loading from '../components/Loading';
 
 dayjs.extend(isBetween);
 
+const columns = [{ "field": "query", "headerName": "Question", "flex": 1 }, { "field": "response", "headerName": "Answer", "flex": 1 }, { "field": "feedback", "headerName": "Remarks", "width": 300 }]
+
 const Chat = () => {
-    const columns = extractColumns(CHAT_DATA, ["timestamp", "id", "name"], [{ field: "remarks", width: 300 }, { field: "name", width: 100 }]);
     const [rows, setRows] = useState([]);
     const [dateRange, setDateRange] = useState([]);
     const [name, setName] = useState([])
     const [loading, setLoading] = useState(false)
 
-    const getChat = async () => {
-        try {
-            setLoading(true)
-            const URL = "https://pragyantest.azurewebsites.net/get_admin_messages"
-            const bodyData = {
-                "pno": "9876543210",
-                "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6"
-            }
-            const { data } = await axiosInstance.post(URL, bodyData)
-            console.log(data)
-            toast.success("Data fetch sucessfully...")
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-
+    // fetch chat data
     useEffect(() => {
-        const fetchChat = async () => {
-            await getChat();
-        };
+        (async () => {
+            const URL = "/get_admin_messages";
+            try {
+                setLoading(true);
+                let start_time = null;
+                let end_time = null;
 
-        fetchChat();
-    }, []);
+                if (dateRange.length > 0 && dateRange[0]) {
+                    start_time = convertToISO(dateRange[0]);
+                    end_time = convertToISO(dateRange[1]);
+                }
+
+                const bodyData = {
+                    "pno": "9876543210",
+                    "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
+                    start_time,
+                    end_time
+                };
+
+                const { data } = await axiosInstance.post(URL, bodyData);
+                setRows(data.messages);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, [dateRange]);
 
 
-    let filteredResults = dateRange.length > 0
-        ? rows.filter((asset) => {
-            const assetDate = dayjs(asset.timestamp).startOf('day');
-            const [startDate, endDate] = dateRange.map((date) => dayjs(date).startOf('day'));
-            return assetDate.isValid() && assetDate.isBetween(startDate, endDate, null, '[]');
-        })
-        : rows;
-
+    let filteredResults = rows
     if (name) {
-        filteredResults = filteredResults.filter((row) => row.name.includes(name))
+        filteredResults = filteredResults.filter((row) => row.username.includes(name))
     }
 
-    const source = dateRange ? filteredResults : rows;
-    const options = [...new Set(source.map((record) => record.name))].map((name) => ({
+    const options = [...new Set(rows.map((record) => record.username))].map((name) => ({
         label: name,
         value: name,
     }));
-
 
     const selectedOption = options.find(option => option.value === name) || null;
 
@@ -99,7 +93,7 @@ const Filter = ({ options, selectedOption, setName, setDateRange }) => {
                 className="basic-multi-select w-full"
                 classNamePrefix="select"
                 options={options}
-                isClearable={false} // Optional: Adds built-in clear (x) button
+                isClearable={true}
             />
             <div className='w-[550px]'>
                 <MyDatePicker setDateRange={setDateRange} />

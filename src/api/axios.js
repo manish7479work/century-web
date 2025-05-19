@@ -2,7 +2,7 @@ import axios from 'axios';
 import { AUTH } from '../constants';
 
 const axiosInstance = axios.create({
-    baseURL: import.meta.env.REACT_APP_API_BASE_URL, // Store this in .env
+    baseURL: import.meta.env.VITE_API_URL, // Store this in .env
     timeout: 10000, // 10 seconds
     headers: {
         'Content-Type': 'application/json',

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import MyDataGrid from '../components/Form/MyDataGrid';
 import MyModel from '../components/MyModel';
 import { USER_CHAT_DATA } from '../data';
-import { extractColumns } from '../utils/helper';
+import { convertToISO, extractColumns, fillMonthlyData, fillYearlyData } from '../utils/helper';
 import MyChat from '../components/MyChat';
 import Breadcrumbs from '../components/Breadcrumb/Breadcrumb';
 import KPI from '../components/KPI';
@@ -16,39 +16,88 @@ import ChatPromptChart from '../components/ChatPromptChart';
 import { BarChart, CartesianGrid, Legend, Treemap, XAxis, YAxis, Bar, Tooltip } from 'recharts';
 import MyBarChart from '../components/MyBarChart';
 import Select from 'react-select';
+import dayjs from 'dayjs';
+import axiosInstance from '../api/axios';
+import Loading from '../components/Loading';
+import { toast } from 'react-toastify';
 
 
-
-const KPI_DATA = [
-    {
-        title: "Hits per Month",
-        value: 12345,
-        icon: <IoCalendarNumberSharp className="text-white text-3xl" />,
-    },
-    {
-        title: "Hits per Day",
-        value: 466545,
-        icon: <IoToday className="text-white text-3xl" />,
-    },
-    {
-        title: "Feedback per Day",
-        value: 98763,
-        icon: <MdFeedback className="text-white text-3xl" />,
-    },
-    {
-        title: "Errors per Day",
-        value: 434,
-        icon: <MdErrorOutline className="text-white text-3xl" />,
-    },
-];
+const initialData = {
+    usage: [],
+    uniqueVisitor: [],
+    errorRate: [],
+    tabelData: []
+}
 
 
 const Overview = () => {
-    const [kpiData, setKpiData] = useState(KPI_DATA)
     const [searchtext, setsearchtext] = useState("")
     const [rows, setRows] = useState(USER_CHAT_DATA)
     const [dateRange, setDateRange] = useState([]);
-    const [period, setPeriod] = useState("day")
+    const [period, setPeriod] = useState()
+    const [DATA, setDATA] = useState(initialData)
+    const [loading, setLoading] = useState(false)
+
+    // fetch chat data
+    useEffect(() => {
+        (async () => {
+            try {
+                setLoading(true);
+
+                let start_time = null;
+                let end_time = null;
+                if (dateRange.length > 0 && dateRange[0]) {
+                    start_time = convertToISO(dateRange[0]);
+                    end_time = convertToISO(dateRange[1]);
+                }
+
+                const bodyData = {
+                    "pno": "9876543210",
+                    "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
+                    // start_time,
+                    // end_time,
+                    mode: period
+                };
+
+                const [usages, uniqueVisitors] = await Promise.all([
+                    axiosInstance.post("/get_usage", bodyData),
+                    axiosInstance.post("/get_unique_visitors", bodyData),
+                    // axiosInstance.post('/get_error_rate'. bodyData)      
+                ]);
+
+
+                console.log(uniqueVisitors)
+
+                const usageData = period === "daily" ? fillMonthlyData(usages?.data.usage_data) : fillYearlyData(usages?.data.usage_data)
+                const uniqueVisitorData = period === "daily" ? fillMonthlyData(uniqueVisitors?.data.unique_users_data) : fillYearlyData(uniqueVisitors?.data.unique_users_data)
+
+                console.log(uniqueVisitorData)
+                setDATA(prev => ({
+                    ...prev,
+                    usage: usageData.map(item => ({
+                        name: item.name,
+                        Usage: item.count
+                    })),
+                    uniqueVisitor: uniqueVisitorData.map(item => ({
+                        name: item.name,
+                        "Unique Visitor": item.count
+                    }))
+                }));
+
+                console.log(data)
+            } catch (error) {
+                console.error(error);
+                toast.error(error?.response?.data)
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, [period]);
+
+    // set the default value to the select
+    useEffect(() => {
+        setPeriod(options[0].value)
+    }, [dateRange])
 
     let filteredData = dateRange.length > 0
         ? rows.filter((asset) => {
@@ -73,30 +122,24 @@ const Overview = () => {
     });
 
     const options = [
-        {
-            "label": "Day",
-            "value": "day"
-        },
-        {
-            "label": "Month",
-            "value": "month"
-        }
-    ]
+        ...((dateRange.length == 0 || !dateRange[0])
+            ? [{ label: "Day", value: "daily" }]
+            : []),
+        { label: "Month", value: "monthly" }
+    ];
 
     const selectedOption = options.find(option => option.value === period) || null;
 
-
     return (
         <div className='h-full flex flex-col gap-2'>
+            {loading && <Loading />}
             <Breadcrumbs />
-            <Filter options={options} selectedOption={selectedOption} setPeriod={setPeriod} />
+            <Filter options={options} selectedOption={selectedOption} setPeriod={setPeriod} setDateRange={setDateRange} />
             <div className='h-full overflow-auto flex gap-2 flex-col'>
                 <div className='flex gap-2'>
-                    {/* <Tree /> */}
-                    {/* <BarData /> */}
-                    <MyBarChart title={"Usage"} period={period} />
-                    <MyBarChart title={"Unique Visitor"} period={period} />
-                    {/* <MyBarChart title={"Error Rate"} /> */}
+                    <MyBarChart title={"Usage"} data={DATA.usage} period={period} />
+                    <MyBarChart title={"Unique Visitor"} data={DATA.uniqueVisitor} period={period} />
+                    <MyBarChart title={"Error Rate"} data={[]} />
 
                 </div>
                 <div className='flex flex-col gap-2'>
@@ -175,7 +218,7 @@ const Table = ({ DATA }) => {
     )
 }
 
-const Filter = ({ options = [], selectedOption = () => { }, setPeriod = "", setDateRange = () => { } }) => {
+const Filter = ({ options = [], selectedOption = () => { }, setPeriod = () => { }, setDateRange = () => { } }) => {
     return (
         <div className='w-full flex gap-2 justify-evenly'>
             <Select
@@ -190,253 +233,11 @@ const Filter = ({ options = [], selectedOption = () => { }, setPeriod = "", setD
                 className="basic-multi-select w-full"
                 classNamePrefix="select"
                 options={options}
-                isClearable={true} // Optional: Adds built-in clear (x) button
+                isClearable={false} // Optional: Adds built-in clear (x) button
             />
 
             <MyDatePicker setDateRange={setDateRange} />
         </div>
     )
 }
-
-// const Filter = ({ searchtext, setsearchtext = () => { } }) => {
-//     return (
-//         <div className='w-full flex gap-2'>
-//             <Input
-//                 placeholder="Search..."
-//                 variant="outlined"
-//                 className="w-full"
-//                 onChange={(e) => {
-//                     setsearchtext(e.target.value);
-//                 }}
-//                 // sx={{ padding: "8px" }}
-//                 value={searchtext}
-//             />
-//             <div className='w-[550px]'>
-//                 <MyDatePicker />
-//             </div>
-//         </div>
-//     )
-// }
-
-
-
-// ***************************************************************************
-
-const Tree = () => {
-    const data = [
-        {
-            "name": "axis",
-            "children": [
-                {
-                    "name": "Axis",
-                    "size": 24593
-                },
-                {
-                    "name": "Axes",
-                    "size": 1302
-                },
-                {
-                    "name": "test",
-                    "size": 652
-                },
-                {
-                    "name": "AxisLabel",
-                    "size": 636
-                },
-                {
-                    "name": "CartesianAxes",
-                    "size": 6703
-                }
-            ]
-        },
-        {
-            "name": "controls",
-            "children": [
-                {
-                    "name": "TooltipControl",
-                    "size": 8435
-                },
-                {
-                    "name": "SelectionControl",
-                    "size": 7862
-                },
-                {
-                    "name": "PanZoomControl",
-                    "size": 5222
-                },
-                {
-                    "name": "HoverControl",
-                    "size": 4896
-                },
-                {
-                    "name": "ControlList",
-                    "size": 4665
-                },
-                {
-                    "name": "ClickControl",
-                    "size": 3824
-                },
-                {
-                    "name": "ExpandControl",
-                    "size": 2832
-                },
-                {
-                    "name": "DragControl",
-                    "size": 2649
-                },
-                {
-                    "name": "AnchorControl",
-                    "size": 2138
-                },
-                {
-                    "name": "Control",
-                    "size": 1353
-                },
-                {
-                    "name": "IControl",
-                    "size": 763
-                }
-            ]
-        },
-        {
-            "name": "data",
-            "children": [
-                {
-                    "name": "Data",
-                    "size": 20544
-                },
-                {
-                    "name": "NodeSprite",
-                    "size": 19382
-                },
-                {
-                    "name": "DataList",
-                    "size": 19788
-                },
-                {
-                    "name": "DataSprite",
-                    "size": 10349
-                },
-                {
-                    "name": "EdgeSprite",
-                    "size": 3301
-                },
-                {
-                    "name": "render",
-                    "children": [
-                        {
-                            "name": "EdgeRenderer",
-                            "size": 5569
-                        },
-                        {
-                            "name": "ShapeRenderer",
-                            "size": 2247
-                        },
-                        {
-                            "name": "ArrowType",
-                            "size": 698
-                        },
-                        {
-                            "name": "IRenderer",
-                            "size": 353
-                        }
-                    ]
-                },
-                {
-                    "name": "ScaleBinding",
-                    "size": 11275
-                },
-                {
-                    "name": "TreeBuilder",
-                    "size": 9930
-                },
-                {
-                    "name": "Tree",
-                    "size": 7147
-                }
-            ]
-        },
-        {
-            "name": "events",
-            "children": [
-                {
-                    "name": "DataEvent",
-                    "size": 7313
-                },
-                {
-                    "name": "SelectionEvent",
-                    "size": 6880
-                },
-                {
-                    "name": "TooltipEvent",
-                    "size": 3701
-                },
-                {
-                    "name": "VisualizationEvent",
-                    "size": 2117
-                }
-            ]
-        },
-
-    ]
-
-    return (
-        <Treemap
-            width={1000}
-            height={550}
-            data={data}
-            dataKey="size"
-            aspectRatio={2 / 3}
-            stroke="#fff"
-            fill="#8884d8"
-        />
-    )
-}
-
-
-const BarData = () => {
-    const data = [
-        {
-            "name": "Page A",
-            "user visitor": 4000,
-        },
-        {
-            "name": "Page B",
-            "user visitor": 3000,
-        },
-        {
-            "name": "Page C",
-            "user visitor": 2000,
-        },
-        {
-            "name": "Page D",
-            "user visitor": 2780,
-        },
-        {
-            "name": "Page E",
-            "user visitor": 1890,
-        },
-        {
-            "name": "Page F",
-            "user visitor": 2390,
-        },
-        {
-            "name": "Page G",
-            "user visitor": 7490,
-        }
-    ]
-
-    return (
-        <BarChart width={430} height={250} data={data}>
-            <CartesianGrid strokeDasharray="3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            {/* <Bar dataKey="pv" fill="#8884d8" /> */}
-            <Bar dataKey="user visitor" fill="#82ca9d" />
-        </BarChart>
-    )
-}
-
 

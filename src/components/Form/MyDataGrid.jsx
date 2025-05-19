@@ -7,6 +7,7 @@ export default function MyDataGrid({ rows, columns }) {
     <DataGrid
       rows={rows}
       columns={columns}
+      getRowId={(row) => row.id ?? row?.employee_code}
       showToolbar
       slots={{ toolbar: GridToolbar }}
       pagination
