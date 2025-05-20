@@ -2,13 +2,15 @@ import { Sidebar, Menu, MenuItem, sidebarClasses, SubMenu } from 'react-pro-side
 import { NavLink } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { IoMenu } from "react-icons/io5";
-import { IconButton } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 import { AvatarWthName, Icon } from './Header';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from './msauth/authConfig';
 import { callMsGraph } from './msauth/graph';
 import { addUser } from '../store/userSlice';
+import { IoMdLogOut } from "react-icons/io";
+
 const CustomSidebar = ({ sidebarData }) => {
     const ACTIVE_BG_COLOR = "#E30613"
     const HOVER_BG_COLOR = "#00000"
@@ -105,8 +107,19 @@ const CustomSidebar = ({ sidebarData }) => {
                 })}
             </Menu>
 
-            <div className='absolute bottom-0 w-full flex justify-start pl-4  mb-2'>
+            <div className='absolute bottom-0 w-full flex flex-col justify-center items-center gap-2 mb-2'>
                 <AvatarWthName name={logedInUserName} isCollapsed={isCollapsed} />
+                {/* <Button
+                    color="error"
+                    variant='outlined'
+                    // fullWidth
+                    sx={{
+                        marginX: "10px"
+                    }}
+                >
+                    Logout
+                </Button> */}
+
             </div>
 
         </Sidebar>

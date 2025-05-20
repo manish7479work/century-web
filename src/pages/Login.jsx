@@ -7,8 +7,7 @@ import loginBanner from "../assets/loginBanner.webp";
 import { Button } from "antd";
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../components/msauth/authConfig";
-import { useDispatch } from "react-redux";
-import { addUser } from "../store/userSlice";
+import axiosInstance from "../api/axios";
 
 
 const Login = () => {
@@ -33,24 +32,39 @@ export default Login;
 
 
 const LoginPage = () => {
-
   const { instance } = useMsal();
   const navigate = useNavigate()
 
+  const getAccessToken = async (ms_acceess_token) => {
+    const URL = "login"
+    const { data } = await axiosInstance.get(URL, {
+      params: {
+        ms_access_token: ms_acceess_token,
+      },
+    });
+    // console.log(data)
+    return data;
 
-  const handleSignIn = () => {
-    instance.loginPopup(loginRequest)
-      .then(response => {
-        console.log("Login successful:", response);
-        localStorage.setItem(AUTH.BEARER_TOKEN, response?.accessToken);
+
+  }
+
+  const handleSignIn = async () => {
+    try {
+      const response = await instance.loginPopup(loginRequest);
+      // console.log("Login successful:", response);
+
+      const data = await getAccessToken(response?.accessToken);
+      if (data) {
+        localStorage.setItem(AUTH.BEARER_TOKEN, data?.access_token);
         navigate("/dashboard"); // Redirect to dashboard
-      })
-      .catch(e => {
-        console.error("Login failed");
-        console.log(e);
-      });
+      } else {
+        toast.error("Unable to login...");
+      }
+    } catch (e) {
+      console.error("Login failed:", e);
+      toast.error("Login failed. Please try again.");
+    }
   };
-
 
   return (
     <div

@@ -66,12 +66,12 @@ const Overview = () => {
                 ]);
 
 
-                console.log(uniqueVisitors)
+                // console.log(uniqueVisitors)
 
                 const usageData = period === "daily" ? fillMonthlyData(usages?.data.usage_data) : fillYearlyData(usages?.data.usage_data)
                 const uniqueVisitorData = period === "daily" ? fillMonthlyData(uniqueVisitors?.data.unique_users_data) : fillYearlyData(uniqueVisitors?.data.unique_users_data)
 
-                console.log(uniqueVisitorData)
+                // console.log(uniqueVisitorData)
                 setDATA(prev => ({
                     ...prev,
                     usage: usageData.map(item => ({
@@ -84,10 +84,16 @@ const Overview = () => {
                     }))
                 }));
 
-                console.log(data)
+                // console.log(data)
             } catch (error) {
-                console.error(error);
-                toast.error(error?.response?.data)
+                console.error(error?.response);
+                // const errorMessage =
+                //     error?.response?.data?.message || // for many API responses
+                //     error?.response?.statusText ||    // fallback to status text
+                //     error?.message ||                 // general JS error
+                //     "Something went wrong";
+
+                // toast.error(errorMessage);
             } finally {
                 setLoading(false);
             }

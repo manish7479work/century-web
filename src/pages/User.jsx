@@ -317,7 +317,7 @@ const User = () => {
                                 }}
                                 variant='outline'
                                 clickable
-                                onClick={() => clickHandle(params.row.id, newStatus)}
+                                onClick={() => clickHandle(params.row, newStatus)}
                                 color={newColor}
                             />
                         );
@@ -339,7 +339,7 @@ const User = () => {
                 }
                 const { data } = await axiosInstance.post(URL, bodyData)
                 const { users } = data
-                console.log(users)
+                // console.log(users)
                 setRows(users)
                 // setColumns(extractColumns(users))
             } catch (error) {
@@ -351,18 +351,21 @@ const User = () => {
         fetchUser();
     }, []);
 
-    console.log(rows)
+    // console.log(rows)
 
-    const updateStatus = async (userId, status) => {
+    const updateStatus = async (phone, status) => {
         try {
-            const URL = "/users"
             setLoading(true)
+            const URL = "modify_user_access"
             const bodyData = {
-                userId,
+                "pno": "9876543210",
+                "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
+                user_pno: phone,
                 status
             }
             const { data } = await axiosInstance.put(URL, bodyData)
-            setRows(data.users)
+            // console.log(data)
+            toast.success("Status updated successfully...")
         } catch (error) {
             throw new Error(error)
         } finally {
@@ -383,14 +386,14 @@ const User = () => {
         return matchesSearch;
     });
 
-    const clickHandle = async (id, status) => {
-        const isConfirm = confirm("Do you really want to change the status ?" + id + status)
+    const clickHandle = async (row, status) => {
+        const isConfirm = confirm("Do you really want to change the status ?" + row?.phone + " with " + status)
         if (isConfirm) {
             try {
-                await updateStatus(id, status)
+                await updateStatus(row?.phone, status)
 
                 const updatedRows = rows.map((row) =>
-                    row.id === id ? { ...row, status } : row
+                    row?.phone === row?.phone ? { ...row, status } : row
                 );
                 setRows(updatedRows);
 
