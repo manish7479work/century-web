@@ -8,6 +8,8 @@ import { PROTECTED_ROUTES, ROUTES } from './constants/routeConstants';
 import Overview from './pages/Overview';
 import Chat from './pages/Chat';
 import User from './pages/User';
+import Profile from './pages/Profile';
+import { PageLayout } from './components/msauth/PageLayout';
 
 const AppRouter = () => {
   return (
@@ -31,6 +33,9 @@ const AppRouter = () => {
           <Route path='fontend' element={<div>Fontend</div>} />
         </Route>
       </Route>
+      <Route path="profile" element={<Profile />} />
+
+      <Route path="loginpage" element={<PageLayout />} />
 
 
       <Route path={ROUTES.PAGE_NOT_FOUND} element={<PageNotFound />} />

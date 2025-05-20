@@ -1,15 +1,26 @@
 import { Sidebar, Menu, MenuItem, sidebarClasses, SubMenu } from 'react-pro-sidebar';
 import { NavLink } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IoMenu } from "react-icons/io5";
 import { IconButton } from '@mui/material';
 import { AvatarWthName, Icon } from './Header';
+import { useDispatch, useSelector } from 'react-redux';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from './msauth/authConfig';
+import { callMsGraph } from './msauth/graph';
+import { addUser } from '../store/userSlice';
 const CustomSidebar = ({ sidebarData }) => {
     const ACTIVE_BG_COLOR = "#E30613"
     const HOVER_BG_COLOR = "#00000"
     const VERSION = import.meta.env.VITE_VERSION ?? 0.0
 
-    const x = "Manish Kumar"
+    const { instance, accounts } = useMsal();
+    const [isCollapsed, setIsCollapsed] = useState(false)
+
+    const dispatch = useDispatch()
+    const user = useSelector((state) => state.user.value)
+
+    const x = user?.displayName ?? "Devloper ."
     let logedInUserName;
     if (x.trim().split(" ").length == 1) {
         logedInUserName = x.trim() + " ."
@@ -17,8 +28,26 @@ const CustomSidebar = ({ sidebarData }) => {
         logedInUserName = x;
     }
 
-    const [isCollapsed, setIsCollapsed] = useState(false)
+    // fetch user details and store into the store
+    useEffect(() => {
+        if (accounts.length > 0) {
+            instance
+                .initialize() // Important: initialize if you're using MSAL v3+
+                .then(() => {
+                    return instance.acquireTokenSilent({
+                        ...loginRequest,
+                        account: accounts[0],
+                    });
+                })
+                .then((response) => {
+                    return callMsGraph(response.accessToken);
+                })
+                .then((data) => dispatch(addUser(data)))
+                .catch((error) => console.error("Token acquisition or Graph call failed:", error));
+        }
+    }, [instance, accounts]);
 
+    console.log(user)
     return (
 
         <Sidebar
