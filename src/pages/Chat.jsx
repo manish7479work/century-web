@@ -12,7 +12,7 @@ import Loading from "../components/Loading";
 // Extend dayjs
 dayjs.extend(relativeTime);
 
-const Chat = () => {
+const Chat = ({ readOnly = false }) => {
     const [chatData, setChatData] = useState([]);
     const [prompt, setPrompt] = useState("");
     const bottomRef = useRef(null);
@@ -97,10 +97,10 @@ const Chat = () => {
         <div className="flex flex-col h-full w-full">
             {loading && <Loading />}
 
-            <div className="mb-3">
+            {!readOnly && <div className="mb-3">
 
                 <Breadcrumbs />
-            </div>
+            </div>}
             <div className="flex-1 overflow-y-auto bg-white py-2 px-4 sm:px-8 space-y-4">
                 {chatData.map((item, idx) => (
                     <div key={idx}>
@@ -119,7 +119,7 @@ const Chat = () => {
 
                 <div ref={bottomRef} />
 
-                <form
+                {!readOnly && (<form
                     onSubmit={handleSubmit}
                     className="sticky bottom-0 bg-white flex items-center border-2 border-gray-200 rounded-md px-2 py-1"
                 >
@@ -133,7 +133,7 @@ const Chat = () => {
                     <IconButton type="submit">
                         <IoSendSharp />
                     </IconButton>
-                </form>
+                </form>)}
             </div>
         </div>
     );

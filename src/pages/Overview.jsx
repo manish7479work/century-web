@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 import axiosInstance from '../api/axios';
 import Loading from '../components/Loading';
 import { toast } from 'react-toastify';
+import Chat from './Chat';
 
 
 // const initialData = {
@@ -56,19 +57,17 @@ const Overview = () => {
                     mode: period
                 };
 
-                const [usages, uniqueVisitors, errorRate, historyDatas] = await Promise.all([
+                const [usages, uniqueVisitors, errorRate, historyData] = await Promise.all([
                     axiosInstance.post("/get_usage", bodyData),
                     axiosInstance.post("/get_unique_visitors", bodyData),
                     axiosInstance.post('/get_error_data', bodyData),
                     axiosInstance.post("get_history_overview", bodyData)
                 ]);
 
-                console.log(historyDatas)
-
                 const usageData = period === "daily" ? fillMonthlyData(usages?.data.usage_data) : fillYearlyData(usages?.data.usage_data)
                 const uniqueVisitorData = period === "daily" ? fillMonthlyData(uniqueVisitors?.data.unique_users_data) : fillYearlyData(uniqueVisitors?.data.unique_users_data)
                 const errorRateData = period === "daily" ? fillMonthlyData(errorRate?.data.error_data) : fillYearlyData(errorRate?.data.error_data)
-                // const historyDatas = period === "daily" ? fillMonthlyData(historyData?.data.error_data) : fillYearlyData(historyData?.data.error_data)
+                // const historyDatas = period === "daily" ? fillMonthlyData(historyData?.data.history_data) : fillYearlyData(historyData?.data.history_data)
 
                 setDATA(prev => ({
                     ...prev,
@@ -82,13 +81,14 @@ const Overview = () => {
                     })),
                     errorRate: errorRateData.map(item => ({
                         name: item.name,
-                        "Unique Visitor": item.count
-                    }))
+                        "Error Rate": item.count
+                    })),
+                    historyData: [] //historyData?.data.history_data
                 }));
 
                 // console.log(data)
             } catch (error) {
-                console.error(error?.response);
+                console.error(error);
                 toast.error("Something went wrong")
             } finally {
                 setLoading(false);
@@ -119,9 +119,10 @@ const Overview = () => {
                 };
                 const { data } = await axiosInstance.post(URL, bodyData)
 
-                console.log(data?.data.usage)
+                console.log(data)
+
                 const usageData = fillYearlyData(data?.data?.usage)
-                const uniqueVisitorData = fillYearlyData(data?.data?.unique_users)
+                const uniqueVisitorData = fillYearlyData(data?.data?.unique_user)
                 const errorRateData = fillYearlyData(data?.data?.error_data)
 
                 setDATA(prev => ({
@@ -136,7 +137,7 @@ const Overview = () => {
                     })),
                     errorRate: errorRateData.map(item => ({
                         name: item.name,
-                        "Unique Visitor": item.count
+                        "Error Rate": item.count
                     })),
                     historyData: data?.data?.active_users_history
                 }));
@@ -212,9 +213,16 @@ const Overview = () => {
 export default Overview;
 
 const Table = ({ DATA }) => {
-    console.log(DATA)
+    const INITIAL_COLUMNS = [
+        { field: "emp_code", headerName: "Employee Code", width: 150 },
+        { field: "name", headerName: "Name", width: 250 },
+        { field: "pno", headerName: "Phone No.", width: 250 },
+        // { field: "designation", headerName: "Designation", width: 150 },
+        { field: "branch_code", headerName: "Branch Code", width: 150 },
+        { field: "territory_code", headerName: "Territory Code", width: 200 },
+    ];
     const [rows, setRows] = useState([])
-    const [columns, setColumns] = useState([])
+    const [columns, setColumns] = useState(INITIAL_COLUMNS)
     const [openModal, setOpenModal] = useState(false)
     const [chatData, setChatData] = useState([])
     const [title, setTitle] = useState()
@@ -223,17 +231,17 @@ const Table = ({ DATA }) => {
         setRows(DATA)
     }, [DATA])
 
-    useEffect(() => {
-        // Example usage
-        const excluded = ["id", "chat"];
-        const customWidths = [
-            { field: 'id', width: 10 },
-            { field: 'role', width: 120 }
-        ];
+    // useEffect(() => {
+    //     // Example usage
+    //     const excluded = ["id", "chat"];
+    //     const customWidths = [
+    //         { field: 'id', width: 10 },
+    //         { field: 'role', width: 120 }
+    //     ];
 
-        const initialColumns = extractColumns(DATA, excluded, customWidths);
-        setColumns(initialColumns)
-    }, [])
+    //     const initialColumns = extractColumns(DATA, excluded, customWidths);
+    //     setColumns(initialColumns)
+    // }, [])
 
     useEffect(() => {
         const filedName = "chats"
@@ -247,7 +255,7 @@ const Table = ({ DATA }) => {
                 {
                     field: filedName,
                     headerName: "Chats",
-                    width: "300",
+                    flex: 1,
                     renderCell: (params) => (
                         <p
                             style={{ textDecoration: "underline", color: "blue" }}
@@ -272,7 +280,7 @@ const Table = ({ DATA }) => {
     return (
         <>
             <MyDataGrid rows={rows} columns={columns} />
-            <MyModel openModal={openModal} setOpenModal={setOpenModal} title={title} RENDER_COMPONENT={<MyChat chatData={chatData} />} />
+            <MyModel openModal={openModal} setOpenModal={setOpenModal} title={title} RENDER_COMPONENT={<Chat readOnly={true} />} />
         </>
     )
 }

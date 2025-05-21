@@ -78,32 +78,80 @@ export const fillMonthlyData = (inputData = []) => {
 
 export const fillYearlyData = (inputData = []) => {
     const result = [];
-
     if (inputData.length === 0) return result;
 
-    // Extract year from the first input record
-    const [year] = inputData[0].month.split("-").map(Number);
+    // Helper function to extract year-month from available fields
+    const extractYearMonth = (item) => {
+        if (item.month) {
+            const [year, month] = item.month.split("-").map(Number);
+            return { year, month };
+        } else if (item.query_timestamp) {
+            const date = new Date(item.query_timestamp);
+            return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1 }; // Month is 0-based
+        }
+        return null;
+    };
 
-    // Create a map from inputData for quick lookup (by "YYYY-MM")
+    // Use the first valid item's year to generate months
+    const firstValid = inputData.find(item => item.month || item.query_timestamp);
+    if (!firstValid) return result;
+
+    const { year } = extractYearMonth(firstValid);
+
+    // Aggregate totals by "YYYY-MM"
     const inputMap = new Map();
     inputData.forEach(item => {
-        const [y, m] = item.month.split("-");
-        const key = `${y}-${m}`;
-        inputMap.set(key, (inputMap.get(key) || 0) + item.total); // sum counts if multiple days in month
+        const ym = extractYearMonth(item);
+        if (!ym) return;
+
+        const monthStr = String(ym.month).padStart(2, "0");
+        const key = `${ym.year}-${monthStr}`;
+
+        inputMap.set(key, (inputMap.get(key) || 0) + item.total);
     });
 
-    // Fill in all 12 months
-    for (let month = 1; month <= 12; month++) {
-        const monthStr = String(month).padStart(2, "0");
+    // Fill all 12 months of the detected year
+    for (let m = 1; m <= 12; m++) {
+        const monthStr = String(m).padStart(2, "0");
         const key = `${year}-${monthStr}`;
-
         result.push({
-            name: monthStr, // "01" for Jan, "02" for Feb, etc.
+            name: monthStr,
             count: inputMap.get(key) || 0
         });
     }
 
     return result;
 };
+
+
+// export const fillYearlyData = (inputData = []) => {
+//     const result = [];
+
+//     if (inputData.length === 0) return result;
+
+//     // Extract year from the first input record
+//     const [year] = inputData[0].month.split("-").map(Number);
+
+//     // Create a map from inputData for quick lookup (by "YYYY-MM")
+//     const inputMap = new Map();
+//     inputData.forEach(item => {
+//         const [y, m] = item.month.split("-");
+//         const key = `${y}-${m}`;
+//         inputMap.set(key, (inputMap.get(key) || 0) + item.total); // sum counts if multiple days in month
+//     });
+
+//     // Fill in all 12 months
+//     for (let month = 1; month <= 12; month++) {
+//         const monthStr = String(month).padStart(2, "0");
+//         const key = `${year}-${monthStr}`;
+
+//         result.push({
+//             name: monthStr, // "01" for Jan, "02" for Feb, etc.
+//             count: inputMap.get(key) || 0
+//         });
+//     }
+
+//     return result;
+// };
 
 
