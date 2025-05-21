@@ -10,6 +10,7 @@ import Chat from './pages/Chat';
 import User from './pages/User';
 import Profile from './pages/Profile';
 import { PageLayout } from './components/msauth/PageLayout';
+import QnaHistory from './pages/QnaHistory';
 
 const AppRouter = () => {
   return (
@@ -24,6 +25,8 @@ const AppRouter = () => {
           <Route index element={<Navigate to="overview" replace />} />
           <Route path="overview" element={<Overview />} />
           <Route path="chat" element={<Chat />} />
+          <Route path="qna-history" element={<QnaHistory />} />
+
           <Route path="user" element={<User />} />
 
 

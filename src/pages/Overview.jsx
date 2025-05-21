@@ -59,17 +59,15 @@ const Overview = () => {
                     mode: period
                 };
 
-                const [usages, uniqueVisitors] = await Promise.all([
+                const [usages, uniqueVisitors, errorRate] = await Promise.all([
                     axiosInstance.post("/get_usage", bodyData),
                     axiosInstance.post("/get_unique_visitors", bodyData),
-                    // axiosInstance.post('/get_error_rate'. bodyData)      
+                    axiosInstance.post('/get_error_data', bodyData)
                 ]);
-
-
-                // console.log(uniqueVisitors)
 
                 const usageData = period === "daily" ? fillMonthlyData(usages?.data.usage_data) : fillYearlyData(usages?.data.usage_data)
                 const uniqueVisitorData = period === "daily" ? fillMonthlyData(uniqueVisitors?.data.unique_users_data) : fillYearlyData(uniqueVisitors?.data.unique_users_data)
+                const errorRateData = period === "daily" ? fillMonthlyData(errorRate?.data.error_data) : fillYearlyData(errorRate?.data.error_data)
 
                 // console.log(uniqueVisitorData)
                 setDATA(prev => ({
@@ -81,12 +79,17 @@ const Overview = () => {
                     uniqueVisitor: uniqueVisitorData.map(item => ({
                         name: item.name,
                         "Unique Visitor": item.count
+                    })),
+                    errorRate: errorRateData.map(item => ({
+                        name: item.name,
+                        "Unique Visitor": item.count
                     }))
                 }));
 
                 // console.log(data)
             } catch (error) {
                 console.error(error?.response);
+                toast.error("Something went wrong")
                 // const errorMessage =
                 //     error?.response?.data?.message || // for many API responses
                 //     error?.response?.statusText ||    // fallback to status text
@@ -145,7 +148,7 @@ const Overview = () => {
                 <div className='flex gap-2'>
                     <MyBarChart title={"Usage"} data={DATA.usage} period={period} />
                     <MyBarChart title={"Unique Visitor"} data={DATA.uniqueVisitor} period={period} />
-                    <MyBarChart title={"Error Rate"} data={[]} />
+                    <MyBarChart title={"Error Rate"} data={DATA.errorRate} period={period} />
 
                 </div>
                 <div className='flex flex-col gap-2'>

@@ -2,6 +2,7 @@ import DashboardTemplate from '../Template/DashboardTemplate';
 import { GrOverview } from "react-icons/gr";
 import { AiFillWechat } from "react-icons/ai";
 import { FaRegUser } from "react-icons/fa";
+import { FaHistory } from "react-icons/fa";
 
 const DATA = [
   {
@@ -11,6 +12,16 @@ const DATA = [
     to: "overview",
     subMenu: [
     ]
+  },
+  {
+    haveSubMenu: false,
+    name: "QnA History",
+    icon: <FaHistory size={"20px"} />,
+    to: "qna-history",
+    subMenu: [
+
+    ],
+
   },
   {
     haveSubMenu: false,
@@ -28,8 +39,10 @@ const DATA = [
     to: "user",
     subMenu: [
 
-    ]
+    ],
+
   },
+
 
 ]
 
