@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { AUTH, COLORS } from "../constants";
 import { isTokenExpired } from "../utils/auth";
@@ -34,6 +34,7 @@ export default Login;
 const LoginPage = () => {
   const { instance } = useMsal();
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
 
   const getAccessToken = async (ms_acceess_token) => {
     const URL = "login"
@@ -50,6 +51,7 @@ const LoginPage = () => {
 
   const handleSignIn = async () => {
     try {
+      setLoading(true)
       const response = await instance.loginPopup(loginRequest);
       // console.log("Login successful:", response);
 
@@ -61,8 +63,10 @@ const LoginPage = () => {
         toast.error("Unable to login...");
       }
     } catch (e) {
-      console.error("Login failed:", e);
       toast.error("Login failed. Please try again.");
+      console.error("Login failed:", e);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -72,6 +76,7 @@ const LoginPage = () => {
       style={{ backgroundImage: `url(${loginBanner})` }}
     >
       <div className=" w-[600px]">
+        {loading && <Loading />}
         <LoginTemplate handleSignIn={handleSignIn} />
         {/* <Button onClick={handleSignIn} variant="contained">Sign In</Button> */}
       </div>
@@ -83,6 +88,7 @@ const LoginPage = () => {
 
 
 import century_icon from "../assets/century-icon.png"
+import Loading from "../components/Loading";
 function LoginTemplate({ handleSignIn }) {
   const VERSION = import.meta.env.VITE_VERSION ?? 0.0
 

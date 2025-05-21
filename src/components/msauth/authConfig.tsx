@@ -1,16 +1,16 @@
 import { LogLevel } from "@azure/msal-browser";
 
 export const msalConfig = {
-  auth: {
-    clientId: "143efdd5-d49b-4000-8636-0081852ae7ff",
-    authority: "https://login.microsoftonline.com/aekaadvisors.com",
-    redirectUri: "http://localhost:5173/getAToken"
-  },
   // auth: {
-  //   clientId: "a0648619-0483-4c5c-ba15-ae54369d05f0",
-  //   authority: "https://login.microsoftonline.com/centuryply.com",
-  //   redirectUri: "http://localhost:3000/getAToken"
+  //   clientId: "143efdd5-d49b-4000-8636-0081852ae7ff",
+  //   authority: "https://login.microsoftonline.com/aekaadvisors.com",
+  //   redirectUri: "http://localhost:5173/getAToken"
   // },
+  auth: {
+    clientId: "a0648619-0483-4c5c-ba15-ae54369d05f0",
+    authority: "https://login.microsoftonline.com/centuryply.com",
+    redirectUri: "http://localhost:3000/getAToken"
+  },
   cache: {
     cacheLocation: "sessionStorage",
     storeAuthStateInCookie: false,
