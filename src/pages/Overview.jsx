@@ -83,7 +83,7 @@ const Overview = () => {
                         name: item.name,
                         "Error Rate": item.count
                     })),
-                    historyData: [] //historyData?.data.history_data
+                    historyData: historyData?.data.history_data
                 }));
 
                 // console.log(data)
