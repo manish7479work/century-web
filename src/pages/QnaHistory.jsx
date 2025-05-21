@@ -10,6 +10,7 @@ import MyDatePicker from '../components/Form/MyDatePicker';
 import { CHAT_DATA } from '../data';
 import axiosInstance from '../api/axios';
 import Loading from '../components/Loading';
+import { useSelector } from 'react-redux';
 
 dayjs.extend(isBetween);
 
@@ -20,6 +21,8 @@ const QnaHistory = () => {
     const [dateRange, setDateRange] = useState([]);
     const [name, setName] = useState([])
     const [loading, setLoading] = useState(false)
+    const user = useSelector((state) => state.user.value)
+    const phone = user?.mobilePhone
 
     // fetch chat data
     useEffect(() => {
@@ -45,7 +48,7 @@ const QnaHistory = () => {
                 }
 
                 const bodyData = {
-                    "pno": "9876543210",
+                    "pno": String(phone),
                     "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
                     start_time,
                     end_time

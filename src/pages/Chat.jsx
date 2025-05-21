@@ -8,6 +8,7 @@ import Header from "../components/Header";
 import axiosInstance from "../api/axios";
 import Breadcrumbs from "../components/Breadcrumb/Breadcrumb";
 import Loading from "../components/Loading";
+import { useSelector } from "react-redux";
 
 // Extend dayjs
 dayjs.extend(relativeTime);
@@ -18,6 +19,10 @@ const Chat = ({ readOnly = false }) => {
     const bottomRef = useRef(null);
     const [loading, setLoading] = useState(false)
     const [fetchChat, setFetchChat] = useState(false)
+    const user = useSelector((state) => state.user.value)
+    const phone = user?.mobilePhone
+
+    console.log(phone)
 
 
     useEffect(() => {
@@ -28,7 +33,7 @@ const Chat = ({ readOnly = false }) => {
                 setLoading(true)
                 const URL = "/get_messages";
                 const bodyData = {
-                    pno: "9876543210",
+                    pno: String(phone),
                     uid: "c9b1a069-2e1e-4138-adac-b7935e769ac6"
                 }
                 const { data } = await axiosInstance.post(URL, bodyData);
@@ -64,7 +69,7 @@ const Chat = ({ readOnly = false }) => {
             setFetchChat(true)
             const URL = "/query";
             const bodyData = {
-                pno: "9876543210",
+                pno: String(phone),
                 uid: "c9b1a069-2e1e-4138-adac-b7935e769ac6",
                 message: prompt
             }

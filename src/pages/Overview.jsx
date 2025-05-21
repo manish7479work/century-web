@@ -21,6 +21,7 @@ import axiosInstance from '../api/axios';
 import Loading from '../components/Loading';
 import { toast } from 'react-toastify';
 import Chat from './Chat';
+import { useSelector } from 'react-redux';
 
 
 // const initialData = {
@@ -45,6 +46,10 @@ const Overview = () => {
     const [period, setPeriod] = useState("daily")
     const [DATA, setDATA] = useState(initialData)
     const [loading, setLoading] = useState(false)
+    const user = useSelector((state) => state.user.value)
+    const phone = user?.mobilePhone
+
+    console.log(phone)
 
     // fetch data
     useEffect(() => {
@@ -52,7 +57,7 @@ const Overview = () => {
             try {
                 setLoading(true);
                 const bodyData = {
-                    "pno": "9876543210",
+                    "pno": String(phone),
                     "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
                     mode: period
                 };
@@ -111,7 +116,7 @@ const Overview = () => {
 
 
                 const bodyData = {
-                    "pno": "9876543210",
+                    "pno": String(phone),
                     "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
                     start_time,
                     end_time,

@@ -49,7 +49,6 @@ const CustomSidebar = ({ sidebarData }) => {
     //     }
     // }, [instance, accounts]);
 
-    console.log(user)
     return (
 
         <Sidebar

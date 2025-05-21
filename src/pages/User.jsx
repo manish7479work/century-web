@@ -260,6 +260,7 @@ import { toast } from 'react-toastify';
 import Breadcrumbs from '../components/Breadcrumb/Breadcrumb';
 import axiosInstance from '../api/axios';
 import Loading from '../components/Loading';
+import { useSelector } from 'react-redux';
 
 const INITIAL_COLUMNS = [
     { field: "emp_code", headerName: "Employee Code", width: 150 },
@@ -274,6 +275,8 @@ const User = () => {
     const [rows, setRows] = useState([]);
     const [searchtext, setsearchtext] = useState("");
     const [loading, setLoading] = useState(false);
+    const user = useSelector((state) => state.user.value)
+    const phone = user?.mobilePhone
 
     // Fetch user data on mount
     useEffect(() => {
@@ -282,7 +285,7 @@ const User = () => {
             try {
                 setLoading(true);
                 const bodyData = {
-                    pno: "9876543210",
+                    pno: String(phone),
                     uid: "c9b1a069-2e1e-4138-adac-b7935e769ac6",
                 };
                 const { data } = await axiosInstance.post(URL, bodyData);
@@ -304,7 +307,7 @@ const User = () => {
             setLoading(true);
             const URL = "modify_user_access";
             const bodyData = {
-                pno: "9876543210",
+                pno: String(phone),
                 uid: "c9b1a069-2e1e-4138-adac-b7935e769ac6",
                 user_pno: phone,
                 status,
