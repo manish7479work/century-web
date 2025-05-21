@@ -22,11 +22,18 @@ import Loading from '../components/Loading';
 import { toast } from 'react-toastify';
 
 
+// const initialData = {
+//     usage: [],
+//     uniqueVisitor: [],
+//     errorRate: [],
+//     tabelData: []
+// }
+
 const initialData = {
     usage: [],
     uniqueVisitor: [],
     errorRate: [],
-    tabelData: []
+    historyData: []
 }
 
 
@@ -34,42 +41,33 @@ const Overview = () => {
     const [searchtext, setsearchtext] = useState("")
     const [rows, setRows] = useState(USER_CHAT_DATA)
     const [dateRange, setDateRange] = useState([]);
-    const [period, setPeriod] = useState()
+    const [period, setPeriod] = useState("daily")
     const [DATA, setDATA] = useState(initialData)
     const [loading, setLoading] = useState(false)
 
-    // fetch chat data
+    // fetch data
     useEffect(() => {
         (async () => {
             try {
                 setLoading(true);
-
-                let start_time = null;
-                let end_time = null;
-                if (dateRange.length > 0 && dateRange[0]) {
-                    start_time = convertToISO(dateRange[0]);
-                    end_time = convertToISO(dateRange[1]);
-                }
-
                 const bodyData = {
                     "pno": "9876543210",
                     "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
-                    // start_time,
-                    // end_time,
                     mode: period
                 };
 
                 const [usages, uniqueVisitors, errorRate] = await Promise.all([
                     axiosInstance.post("/get_usage", bodyData),
                     axiosInstance.post("/get_unique_visitors", bodyData),
-                    axiosInstance.post('/get_error_data', bodyData)
+                    axiosInstance.post('/get_error_data', bodyData),
+                    // axiosInstance.post("get_history_overview", bodyData)
                 ]);
 
                 const usageData = period === "daily" ? fillMonthlyData(usages?.data.usage_data) : fillYearlyData(usages?.data.usage_data)
                 const uniqueVisitorData = period === "daily" ? fillMonthlyData(uniqueVisitors?.data.unique_users_data) : fillYearlyData(uniqueVisitors?.data.unique_users_data)
                 const errorRateData = period === "daily" ? fillMonthlyData(errorRate?.data.error_data) : fillYearlyData(errorRate?.data.error_data)
+                // const historyDatas = period === "daily" ? fillMonthlyData(historyData?.data.error_data) : fillYearlyData(historyData?.data.error_data)
 
-                // console.log(uniqueVisitorData)
                 setDATA(prev => ({
                     ...prev,
                     usage: usageData.map(item => ({
@@ -90,20 +88,74 @@ const Overview = () => {
             } catch (error) {
                 console.error(error?.response);
                 toast.error("Something went wrong")
-                // const errorMessage =
-                //     error?.response?.data?.message || // for many API responses
-                //     error?.response?.statusText ||    // fallback to status text
-                //     error?.message ||                 // general JS error
-                //     "Something went wrong";
-
-                // toast.error(errorMessage);
             } finally {
                 setLoading(false);
             }
         })();
     }, [period]);
 
-    // set the default value to the select
+    const fetchDataOnDateRange = async () => {
+        try {
+            const URL = "/overview_timerange_data"
+            let start_time = null;
+            let end_time = null;
+            if (dateRange.length > 0 && dateRange[0]) {
+                start_time = convertToISO(dateRange[0]);
+
+                // Add one day to dateRange[1]
+                const endDate = new Date(dateRange[1]);
+                endDate.setDate(endDate.getDate() + 1);
+                end_time = convertToISO(endDate);
+
+
+                const bodyData = {
+                    "pno": "9876543210",
+                    "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
+                    start_time,
+                    end_time,
+                    mode: period
+                };
+                const { data } = await axiosInstance.post(URL, bodyData)
+                console.log(data)
+
+                const usageData = fillYearlyData(data?.usage)
+                const uniqueVisitorData = fillYearlyData(data?.unique_users)
+                const errorRateData = fillYearlyData(data?.error_data)
+                // const historyDatas = fillYearlyData(data?.active_users_history)
+
+                // console.log(uniqueVisitorData)
+                setDATA(prev => ({
+                    ...prev,
+                    usage: usageData.map(item => ({
+                        name: item.name,
+                        Usage: item.count
+                    })),
+                    uniqueVisitor: uniqueVisitorData.map(item => ({
+                        name: item.name,
+                        "Unique Visitor": item.count
+                    })),
+                    errorRate: errorRateData.map(item => ({
+                        name: item.name,
+                        "Unique Visitor": item.count
+                    })),
+                    // historyData: historyData.map(item => ({
+                    //     name: item.name,
+                    //     "Unique Visitor": item.count
+                    // }))
+                }));
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error("Something went wrong")
+        }
+    }
+
+    useEffect(() => {
+        fetchDataOnDateRange()
+        console.log("date rnage")
+    }, [dateRange])
+
+
     useEffect(() => {
         setPeriod(options[0].value)
     }, [dateRange])
