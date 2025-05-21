@@ -1,5 +1,5 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login';
 import PageNotFound from './components/PageNotFound';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -11,36 +11,42 @@ import User from './pages/User';
 import Profile from './pages/Profile';
 import { PageLayout } from './components/msauth/PageLayout';
 import QnaHistory from './pages/QnaHistory';
+import { AUTH } from './constants';
 
 const AppRouter = () => {
+  const [role, setRole] = useState(() => sessionStorage.getItem(AUTH.ROLE));
+  const location = useLocation();
+
+  useEffect(() => {
+    const storedRole = sessionStorage.getItem(AUTH.ROLE);
+    setRole(storedRole);
+  }, [location]); // re-check role on every route change
+  // Optionally: add a polling interval or storage listener if role changes mid-session
+
+  const toOverview = role === AUTH.ADMIN;
+
   return (
     <Routes>
       <Route path="/" element={<div>Home</div>} />
-      {/* ✅ Redirect from / to /login */}
       <Route index element={<Navigate to={ROUTES.LOGIN} replace />} />
       <Route path={ROUTES.LOGIN} element={<Login />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path={PROTECTED_ROUTES.DASHBOARD} element={<Dashboard />}>
-          <Route index element={<Navigate to="overview" replace />} />
-          <Route path="overview" element={<Overview />} />
+          <Route index element={<Navigate to={toOverview ? 'overview' : 'chat'} replace />} />
           <Route path="chat" element={<Chat />} />
-          <Route path="qna-history" element={<QnaHistory />} />
-
-          <Route path="user" element={<User />} />
-
-
-
-          <Route path="settings" element={<div>Settings</div>} />
-          <Route path="profile" element={<div>Profile</div>} />
-          <Route path='fontend' element={<div>Fontend</div>} />
+          {toOverview && (
+            <>
+              <Route path="overview" element={<Overview />} />
+              <Route path="qna-history" element={<QnaHistory />} />
+              <Route path="user" element={<User />} />
+            </>
+          )}
         </Route>
       </Route>
+
       <Route path="profile" element={<Profile />} />
-
       <Route path="loginpage" element={<PageLayout />} />
-
-
       <Route path={ROUTES.PAGE_NOT_FOUND} element={<PageNotFound />} />
     </Routes>
   );

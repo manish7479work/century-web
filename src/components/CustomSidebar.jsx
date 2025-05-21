@@ -30,24 +30,24 @@ const CustomSidebar = ({ sidebarData }) => {
         logedInUserName = x;
     }
 
-    // fetch user details and store into the store
-    useEffect(() => {
-        if (accounts.length > 0) {
-            instance
-                .initialize() // Important: initialize if you're using MSAL v3+
-                .then(() => {
-                    return instance.acquireTokenSilent({
-                        ...loginRequest,
-                        account: accounts[0],
-                    });
-                })
-                .then((response) => {
-                    return callMsGraph(response.accessToken);
-                })
-                .then((data) => dispatch(addUser(data)))
-                .catch((error) => console.error("Token acquisition or Graph call failed:", error));
-        }
-    }, [instance, accounts]);
+    // // fetch user details and store into the store
+    // useEffect(() => {
+    //     if (accounts.length > 0) {
+    //         instance
+    //             .initialize() // Important: initialize if you're using MSAL v3+
+    //             .then(() => {
+    //                 return instance.acquireTokenSilent({
+    //                     ...loginRequest,
+    //                     account: accounts[0],
+    //                 });
+    //             })
+    //             .then((response) => {
+    //                 return callMsGraph(response.accessToken);
+    //             })
+    //             .then((data) => dispatch(addUser(data)))
+    //             .catch((error) => console.error("Token acquisition or Graph call failed:", error));
+    //     }
+    // }, [instance, accounts]);
 
     console.log(user)
     return (
