@@ -56,12 +56,14 @@ const Overview = () => {
                     mode: period
                 };
 
-                const [usages, uniqueVisitors, errorRate] = await Promise.all([
+                const [usages, uniqueVisitors, errorRate, historyDatas] = await Promise.all([
                     axiosInstance.post("/get_usage", bodyData),
                     axiosInstance.post("/get_unique_visitors", bodyData),
                     axiosInstance.post('/get_error_data', bodyData),
-                    // axiosInstance.post("get_history_overview", bodyData)
+                    axiosInstance.post("get_history_overview", bodyData)
                 ]);
+
+                console.log(historyDatas)
 
                 const usageData = period === "daily" ? fillMonthlyData(usages?.data.usage_data) : fillYearlyData(usages?.data.usage_data)
                 const uniqueVisitorData = period === "daily" ? fillMonthlyData(uniqueVisitors?.data.unique_users_data) : fillYearlyData(uniqueVisitors?.data.unique_users_data)
@@ -116,14 +118,12 @@ const Overview = () => {
                     mode: period
                 };
                 const { data } = await axiosInstance.post(URL, bodyData)
-                console.log(data)
 
-                const usageData = fillYearlyData(data?.usage)
-                const uniqueVisitorData = fillYearlyData(data?.unique_users)
-                const errorRateData = fillYearlyData(data?.error_data)
-                // const historyDatas = fillYearlyData(data?.active_users_history)
+                console.log(data?.data.usage)
+                const usageData = fillYearlyData(data?.data?.usage)
+                const uniqueVisitorData = fillYearlyData(data?.data?.unique_users)
+                const errorRateData = fillYearlyData(data?.data?.error_data)
 
-                // console.log(uniqueVisitorData)
                 setDATA(prev => ({
                     ...prev,
                     usage: usageData.map(item => ({
@@ -138,10 +138,7 @@ const Overview = () => {
                         name: item.name,
                         "Unique Visitor": item.count
                     })),
-                    // historyData: historyData.map(item => ({
-                    //     name: item.name,
-                    //     "Unique Visitor": item.count
-                    // }))
+                    historyData: data?.data?.active_users_history
                 }));
             }
         } catch (error) {
@@ -155,32 +152,33 @@ const Overview = () => {
         console.log("date rnage")
     }, [dateRange])
 
+    console.log(DATA)
 
     useEffect(() => {
         setPeriod(options[0].value)
     }, [dateRange])
 
-    let filteredData = dateRange.length > 0
-        ? rows.filter((asset) => {
-            const assetDate = dayjs(asset.timestamp).startOf('day');
-            const [startDate, endDate] = dateRange.map((date) => dayjs(date).startOf('day'));
-            return assetDate.isValid() && assetDate.isBetween(startDate, endDate, null, '[]');
-        })
-        : rows;
+    // let filteredData = dateRange.length > 0
+    //     ? rows.filter((asset) => {
+    //         const assetDate = dayjs(asset.timestamp).startOf('day');
+    //         const [startDate, endDate] = dateRange.map((date) => dayjs(date).startOf('day'));
+    //         return assetDate.isValid() && assetDate.isBetween(startDate, endDate, null, '[]');
+    //     })
+    //     : rows;
 
 
-    filteredData = filteredData.filter((item) => {
-        const matchesSearch =
-            !searchtext ||
-            Object.values(item).some(
-                (value) =>
-                    value &&
-                    typeof value === "string" &&
-                    value.toLowerCase().includes(searchtext.toLowerCase())
-            );
+    // filteredData = filteredData.filter((item) => {
+    //     const matchesSearch =
+    //         !searchtext ||
+    //         Object.values(item).some(
+    //             (value) =>
+    //                 value &&
+    //                 typeof value === "string" &&
+    //                 value.toLowerCase().includes(searchtext.toLowerCase())
+    //         );
 
-        return matchesSearch;
-    });
+    //     return matchesSearch;
+    // });
 
     const options = [
         ...((dateRange.length == 0 || !dateRange[0])
@@ -190,7 +188,6 @@ const Overview = () => {
     ];
 
     const selectedOption = options.find(option => option.value === period) || null;
-
     return (
         <div className='h-full flex flex-col gap-2'>
             {loading && <Loading />}
@@ -205,7 +202,7 @@ const Overview = () => {
                 </div>
                 <div className='flex flex-col gap-2'>
                     {/* <Filter searchtext={searchtext} setsearchtext={setsearchtext} setDateRange={setDateRange} /> */}
-                    <Table DATA={filteredData} />
+                    <Table DATA={DATA?.historyData} />
                 </div>
             </div>
         </div>
@@ -215,6 +212,7 @@ const Overview = () => {
 export default Overview;
 
 const Table = ({ DATA }) => {
+    console.log(DATA)
     const [rows, setRows] = useState([])
     const [columns, setColumns] = useState([])
     const [openModal, setOpenModal] = useState(false)
