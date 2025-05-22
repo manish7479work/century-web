@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { FaUser, FaRobot } from "react-icons/fa";
 import { IoSendSharp } from "react-icons/io5";
-import { IconButton } from "@mui/material";
+import { Alert, IconButton } from "@mui/material";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Header from "../components/Header";
@@ -91,73 +91,78 @@ const Chat = ({ readOnly = false }) => {
         }
     };
 
+    // useEffect(() => {
+    //     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    // }, [chatData, fetchChat]);
+
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        const timer = setTimeout(() => {
+            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 50); // Delay to allow Markdown to render
+
+        return () => clearTimeout(timer);
     }, [chatData, fetchChat]);
 
     return (
-        <div className="flex flex-col h-full w-full">
+        <div className="flex flex-col h-full w-full gap-2">
             {loading && <Loading />}
+            {!readOnly && (<Breadcrumbs />)}
 
-            {!readOnly && (
-                <div className="mb-1">
-                    <Breadcrumbs />
-                </div>
-            )}
-
-            <div className="flex flex-col flex-1 h-0 bg-white px-2 py-1 space-y-1">
-                {/* Scrollable container */}
-                <div className="flex-1 overflow-y-auto">
-                    {/* Inner padding container for pr-2 to give space from scrollbar */}
-                    <div className="pr-2 space-y-2">
+            <div className="h-full overflow-y-auto bg-white p-2">
+                {chatData.length > 0 ? (
+                    <>
                         {chatData.map((item, idx) => (
-                            <div key={idx}>
-                                <ChatMessage
-                                    type={item.sender}
-                                    text={item.message}
-                                    timestamp={item.timestamp}
-                                />
-                            </div>
+                            <ChatMessage
+                                key={idx}
+                                type={item.sender}
+                                text={item.message}
+                                timestamp={item.timestamp}
+                            />
                         ))}
-
                         {fetchChat && <ChatLoader />}
-                        <div ref={bottomRef} />
-                    </div>
-                </div>
-
-                {/* Input form */}
-                {!readOnly && (
-                    <form
-                        onSubmit={handleSubmit}
-                        className="mt-1 bg-white flex items-center border-2 border-gray-200 rounded-md px-2 py-1"
-                    >
-                        <input
-                            type="text"
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            placeholder="Chat with Pragyan"
-                            className="flex-1 bg-transparent outline-none text-sm placeholder:text-gray-600"
-                        />
-                        <IconButton type="submit">
-                            <IoSendSharp />
-                        </IconButton>
-                    </form>
+                    </>
+                ) : (
+                    <Alert severity="warning">No Chat Found.</Alert>
                 )}
+
+
+
+                <div ref={bottomRef} />
+
             </div>
+            <PromptField readOnly={readOnly} handleSubmit={handleSubmit} prompt={prompt} setPrompt={setPrompt} />
         </div>
-
-
     );
 };
 
 export default Chat;
-import { MarkdownHooks } from 'react-markdown'
 
+const PromptField = ({ readOnly, handleSubmit, prompt, setPrompt }) => {
+    return (
+        !readOnly && (<form
+            onSubmit={handleSubmit}
+            className="sticky bottom-0 bg-white flex items-center border-2 border-gray-200 rounded-md px-2 py-1 mx-3"
+        >
+            <input
+                type="text"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Chat with Pragyan"
+                className="flex-1 bg-transparent outline-none text-sm placeholder:text-gray-600"
+            />
+            <IconButton type="submit">
+                <IoSendSharp />
+            </IconButton>
+        </form>)
+
+    )
+}
+
+import { MarkdownHooks } from 'react-markdown'
 const ChatMessage = ({ type, text, timestamp }) => {
     const isUser = type === "user";
     const Icon = isUser ? FaUser : FaRobot;
-    // const parsedText = text.split(/\*\*(.*?)\*\*/g); // parse **bold**
-
+    const parsedText = text.split(/\*\*(.*?)\*\*/g); // parse **bold**
 
     return (
         <div className={`flex items-start ${isUser ? "justify-end" : "justify-start"} mb-4`}>
@@ -171,12 +176,10 @@ const ChatMessage = ({ type, text, timestamp }) => {
                     className={`px-4 py-3 rounded-lg max-w-xl text-sm shadow 
                     ${isUser ? "bg-blue-100 text-gray-900" : "bg-gray-100 text-gray-800"}`}
                 >
-                    {/* {parsedText.map((part, i) =>
-                        i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>
-                    )} */}
-                    {/* <span>{text}</span> */}
                     <MarkdownHooks>{text}</MarkdownHooks>
+                    {/* {text} */}
                 </div>
+
             </div>
             {isUser && (
                 <div className="ml-2 mt-1 text-gray-500">
