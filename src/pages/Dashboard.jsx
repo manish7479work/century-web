@@ -179,6 +179,15 @@ const Dashboard = () => {
     }
   }, [instance, accounts]);
 
+  // update the html tiite
+  useEffect(() => {
+    const role = sessionStorage.getItem(AUTH.ROLE);
+    const title = role === AUTH.ADMIN ? "Pragyan | Admin Panel" : "Pragyan | Chat";
+    if (role) {
+      document.title = title;
+    }
+  }, [sideBarProps]); //sidebar props change, it change the title because sidebar changes when role changes 
+
 
   return (
     <>
