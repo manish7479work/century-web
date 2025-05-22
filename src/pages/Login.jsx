@@ -35,29 +35,42 @@ const LoginPage = () => {
   const { instance } = useMsal();
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [phone, setPhone] = useState(null)
 
-  const getAccessToken = async (ms_acceess_token) => {
+  const getAccessToken = async (ms_acceess_token, phone) => {
     const URL = "login"
-    const { data } = await axiosInstance.get(URL, {
-      params: {
-        ms_access_token: ms_acceess_token,
-      },
-    });
+    const bodyData = {
+      ms_access_token: ms_acceess_token,
+      pno: phone
+    }
+    const { data } = await axiosInstance.post(URL, bodyData);
     // console.log(data)
     return data;
-
 
   }
 
   const handleSignIn = async () => {
     try {
+      if (!phone) {
+        toast.warning("Phone Number is Mandatory")
+        return
+      }
+
+      const digits = String(phone).replace(/\D/g, '');
+
+      if (digits.length !== 10) {
+        toast.warning("Phone No. must be 10 digits");
+        return;
+      }
       setLoading(true)
       const response = await instance.loginPopup(loginRequest);
-      // console.log("Login successful:", response);
 
-      const data = await getAccessToken(response?.accessToken);
+      const data = await getAccessToken(response?.accessToken, phone);
       if (data) {
+        const role = data?.user_role === AUTH.ADMIN.toLowerCase() ? AUTH.ADMIN : AUTH.USER
+        sessionStorage.setItem(AUTH.ROLE, role)
         sessionStorage.setItem(AUTH.BEARER_TOKEN, data?.access_token);
+
         navigate("/dashboard"); // Redirect to dashboard
       } else {
         toast.error("Unable to login...");
@@ -77,7 +90,7 @@ const LoginPage = () => {
     >
       <div className=" w-[600px]">
         {loading && <Loading />}
-        <LoginTemplate handleSignIn={handleSignIn} />
+        <LoginTemplate handleSignIn={handleSignIn} phone={phone} setPhone={setPhone} />
         {/* <Button onClick={handleSignIn} variant="contained">Sign In</Button> */}
       </div>
     </div>
@@ -89,7 +102,9 @@ const LoginPage = () => {
 
 import century_icon from "../assets/century-icon.png"
 import Loading from "../components/Loading";
-function LoginTemplate({ handleSignIn }) {
+import { Input } from "@mui/joy";
+import { toast } from "react-toastify";
+function LoginTemplate({ handleSignIn, phone, setPhone = () => { } }) {
   const VERSION = import.meta.env.VITE_VERSION ?? 0.0
 
 
@@ -114,9 +129,19 @@ function LoginTemplate({ handleSignIn }) {
           Use your CenturyPly Email Account
         </p>
 
+        <Input
+          placeholder="Enter Your Register Phone No."
+          variant="outlined"
+          className="w-[350px] mx-auto mb-6"
+          onChange={(e) => setPhone(e.target.value)}
+          type="number"
+          sx={{ padding: "8px" }}
+        // value={phone}
+        />
+
         {/* Login Button */}
         <button
-          className="bg-primary hover:bg-red-700 text-white font-semibold py-3 px-6 rounded font-helvetica text-base"
+          className="bg-primary hover:bg-red-700 text-white font-semibold py-3 px-6 rounded font-helvetica text-base cursor-pointer"
           onClick={handleSignIn}
         >
           Sign in
