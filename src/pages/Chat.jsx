@@ -101,45 +101,54 @@ const Chat = ({ readOnly = false }) => {
         <div className="flex flex-col h-full w-full">
             {loading && <Loading />}
 
-            {!readOnly && <div className="mb-3">
+            {!readOnly && (
+                <div className="mb-1">
+                    <Breadcrumbs />
+                </div>
+            )}
 
-                <Breadcrumbs />
-            </div>}
-            <div className="flex-1 overflow-y-auto bg-white py-2 px-4 sm:px-8 space-y-4">
-                {chatData.map((item, idx) => (
-                    <div key={idx}>
+            <div className="flex flex-col flex-1 h-0 bg-white px-2 py-1 space-y-1">
+                {/* Scrollable container */}
+                <div className="flex-1 overflow-y-auto">
+                    {/* Inner padding container for pr-2 to give space from scrollbar */}
+                    <div className="pr-2 space-y-2">
+                        {chatData.map((item, idx) => (
+                            <div key={idx}>
+                                <ChatMessage
+                                    type={item.sender}
+                                    text={item.message}
+                                    timestamp={item.timestamp}
+                                />
+                            </div>
+                        ))}
 
-                        {/* <ChatMessage type="user" text={item.sender} timestamp={item.timestamp} />
-                        <ChatMessage type="ai" text={item.message} timestamp={item.timestamp} /> */}
-
-                        <ChatMessage type={item.sender} text={item.message} timestamp={item.timestamp} />
-
+                        {fetchChat && <ChatLoader />}
+                        <div ref={bottomRef} />
                     </div>
+                </div>
 
-                ))}
-
-                {fetchChat && (<ChatLoader />
+                {/* Input form */}
+                {!readOnly && (
+                    <form
+                        onSubmit={handleSubmit}
+                        className="mt-1 bg-white flex items-center border-2 border-gray-200 rounded-md px-2 py-1"
+                    >
+                        <input
+                            type="text"
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            placeholder="Chat with Pragyan"
+                            className="flex-1 bg-transparent outline-none text-sm placeholder:text-gray-600"
+                        />
+                        <IconButton type="submit">
+                            <IoSendSharp />
+                        </IconButton>
+                    </form>
                 )}
-
-                <div ref={bottomRef} />
-
-                {!readOnly && (<form
-                    onSubmit={handleSubmit}
-                    className="sticky bottom-0 bg-white flex items-center border-2 border-gray-200 rounded-md px-2 py-1"
-                >
-                    <input
-                        type="text"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        placeholder="Chat with Pragyan"
-                        className="flex-1 bg-transparent outline-none text-sm placeholder:text-gray-600"
-                    />
-                    <IconButton type="submit">
-                        <IoSendSharp />
-                    </IconButton>
-                </form>)}
             </div>
         </div>
+
+
     );
 };
 
