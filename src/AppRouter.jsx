@@ -25,8 +25,6 @@ const AppRouter = () => {
 
   const toOverview = role === AUTH.ADMIN;
 
-  console.log(toOverview)
-
   return (
     <Routes>
       <Route path="/" element={<div>Home</div>} />
