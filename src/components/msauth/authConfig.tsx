@@ -9,7 +9,9 @@ export const msalConfig = {
   auth: {
     clientId: "a0648619-0483-4c5c-ba15-ae54369d05f0",
     authority: "https://login.microsoftonline.com/centuryply.com",
-    redirectUri: "http://localhost:3000/getAToken"
+    // redirectUri: "http://localhost:3000/getAToken"
+    redirectUri: "https://green-bush-0c2e6a700.6.azurestaticapps.net/getAToken"
+
   },
   cache: {
     cacheLocation: "sessionStorage",
