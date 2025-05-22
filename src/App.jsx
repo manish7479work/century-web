@@ -3,6 +3,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import AppRouter from './AppRouter';
 import "./App.css"
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 const App = () => {
   return (
@@ -19,8 +21,9 @@ const App = () => {
         pauseOnHover
         theme="light"
       />
-
-      <AppRouter />
+      <Provider store={store}>
+        <AppRouter />
+      </Provider>
     </BrowserRouter>
   );
 };

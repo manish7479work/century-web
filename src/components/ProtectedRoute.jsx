@@ -5,14 +5,15 @@ import { isTokenExpired } from '../utils/auth';
 import { ROUTES } from '../constants/routeConstants';
 
 const ProtectedRoute = () => {
-  const token = localStorage.getItem(AUTH.BEARER_TOKEN);
+  const token = sessionStorage.getItem(AUTH.BEARER_TOKEN);
+
 
   if (!token) return <Navigate to={ROUTES.LOGIN} />;
 
   try {
     const isExpired = isTokenExpired(token);
     if (isExpired) {
-      localStorage.removeItem(constants.AUTH.BEARER_TOKEN);
+      localStorage.sessionStorage(constants.AUTH.BEARER_TOKEN);
       return <Navigate to={ROUTES.LOGIN} />;
     }
 
