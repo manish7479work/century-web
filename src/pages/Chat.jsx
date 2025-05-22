@@ -153,11 +153,13 @@ const Chat = ({ readOnly = false }) => {
 };
 
 export default Chat;
+import { MarkdownHooks } from 'react-markdown'
 
 const ChatMessage = ({ type, text, timestamp }) => {
     const isUser = type === "user";
     const Icon = isUser ? FaUser : FaRobot;
-    const parsedText = text.split(/\*\*(.*?)\*\*/g); // parse **bold**
+    // const parsedText = text.split(/\*\*(.*?)\*\*/g); // parse **bold**
+
 
     return (
         <div className={`flex items-start ${isUser ? "justify-end" : "justify-start"} mb-4`}>
@@ -171,14 +173,12 @@ const ChatMessage = ({ type, text, timestamp }) => {
                     className={`px-4 py-3 rounded-lg max-w-xl text-sm shadow 
                     ${isUser ? "bg-blue-100 text-gray-900" : "bg-gray-100 text-gray-800"}`}
                 >
-                    {parsedText.map((part, i) =>
+                    {/* {parsedText.map((part, i) =>
                         i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>
-                    )}
+                    )} */}
                     {/* <span>{text}</span> */}
+                    <MarkdownHooks>{text}</MarkdownHooks>
                 </div>
-                {/* <div className="text-xs text-gray-600 mt-2 text-right">
-                    {dayjs(timestamp).fromNow()}
-                </div> */}
             </div>
             {isUser && (
                 <div className="ml-2 mt-1 text-gray-500">

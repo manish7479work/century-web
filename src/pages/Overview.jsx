@@ -24,14 +24,6 @@ import Chat from './Chat';
 import { useSelector } from 'react-redux';
 import { AUTH } from '../constants';
 
-
-// const initialData = {
-//     usage: [],
-//     uniqueVisitor: [],
-//     errorRate: [],
-//     tabelData: []
-// }
-
 const initialData = {
     usage: [],
     uniqueVisitor: [],
@@ -39,22 +31,18 @@ const initialData = {
     historyData: []
 }
 
-
 const Overview = () => {
-    const [searchtext, setsearchtext] = useState("")
     const [rows, setRows] = useState(USER_CHAT_DATA)
     const [dateRange, setDateRange] = useState([]);
     const [period, setPeriod] = useState("daily")
     const [DATA, setDATA] = useState(initialData)
     const [loading, setLoading] = useState(false)
-    // const phone = useSelector((state) => state.user.phone)
     const phone = sessionStorage.getItem(AUTH.PHONE)
-
-    console.log(phone)
 
     // fetch data
     useEffect(() => {
         (async () => {
+            if (dateRange.length > 0 && dateRange[0]) return;
             try {
                 setLoading(true);
                 const bodyData = {
@@ -125,11 +113,15 @@ const Overview = () => {
                 };
                 const { data } = await axiosInstance.post(URL, bodyData)
 
-                console.log(data)
 
                 const usageData = fillYearlyData(data?.data?.usage)
                 const uniqueVisitorData = fillYearlyData(data?.data?.unique_user)
                 const errorRateData = fillYearlyData(data?.data?.error_data)
+
+                // console.log(data.data)
+                // console.log(uniqueVisitorData)
+                // console.log(usageData)
+                // console.log(errorRateData)
 
                 setDATA(prev => ({
                     ...prev,
@@ -156,36 +148,11 @@ const Overview = () => {
 
     useEffect(() => {
         fetchDataOnDateRange()
-        console.log("date rnage")
     }, [dateRange])
-
-    console.log(DATA)
 
     useEffect(() => {
         setPeriod(options[0].value)
     }, [dateRange])
-
-    // let filteredData = dateRange.length > 0
-    //     ? rows.filter((asset) => {
-    //         const assetDate = dayjs(asset.timestamp).startOf('day');
-    //         const [startDate, endDate] = dateRange.map((date) => dayjs(date).startOf('day'));
-    //         return assetDate.isValid() && assetDate.isBetween(startDate, endDate, null, '[]');
-    //     })
-    //     : rows;
-
-
-    // filteredData = filteredData.filter((item) => {
-    //     const matchesSearch =
-    //         !searchtext ||
-    //         Object.values(item).some(
-    //             (value) =>
-    //                 value &&
-    //                 typeof value === "string" &&
-    //                 value.toLowerCase().includes(searchtext.toLowerCase())
-    //         );
-
-    //     return matchesSearch;
-    // });
 
     const options = [
         ...((dateRange.length == 0 || !dateRange[0])
