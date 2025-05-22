@@ -112,16 +112,22 @@ const LoginPage = () => {
 
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center bg-white w-screen h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url(${loginBanner})` }}
-    >
-      <div className=" w-[450px]">
-        {loading && <Loading />}
-        <LoginTemplate handleSignIn={handleSignIn} phone={phone} setPhone={setPhone} />
-        {/* <Button onClick={handleSignIn} variant="contained">Sign In</Button> */}
+    <div className="relative w-screen h-screen overflow-hidden">
+      {/* Background Blur Layer */}
+      <div
+        className="absolute inset-0 bg-cover bg-center blur-[5px]"
+        style={{ backgroundImage: `url(${loginBanner})` }}
+      ></div>
+
+      {/* Foreground Content */}
+      <div className="relative z-10 min-h-screen flex items-center justify-center">
+        <div className="w-[28rem] h-[30rem] ">
+          {loading && <Loading />}
+          <LoginTemplate handleSignIn={handleSignIn} phone={phone} setPhone={setPhone} />
+        </div>
       </div>
     </div>
+
   );
 };
 
@@ -141,27 +147,27 @@ function LoginTemplate({ handleSignIn, phone, setPhone = () => { } }) {
 
       {/* Login Card */}
       {/* <div className="backdrop-blur-sm  border border-gray-300 h-full w-full text-center py-8 rounded-md"> */}
-      <div className="bg-white  border border-gray-300 h-full w-full text-center py-8 rounded-md">
+      <div className="bg-white flex flex-col gap-5 border-2 border-white h-full w-full text-center py-8 rounded-md">
 
         {/* Logo */}
         <img
           src={century_icon}
           alt="Century ply logo"
-          className="mx-auto h-20 mb-4"
+          className="mx-auto h-28"
         />
 
         {/* Title */}
-        <h2 className="text-2xl font-semibold mb-6 font-helvetica">Login</h2>
+        <h2 className="text-4xl font-semibold font-helvetica">Login</h2>
 
         {/* Description */}
-        <p className="text-gray-600 mb-6 font-helvetica">
+        <p className="text-gray-600 font-helvetica">
           Use your CenturyPly Email Account
         </p>
 
         <Input
           placeholder="Enter Your Register Phone No."
           variant="outlined"
-          className="w-[350px] mx-auto mb-6"
+          className="w-[350px] mx-auto "
           onChange={(e) => setPhone(e.target.value)}
           type="number"
           sx={{ padding: "8px" }}
@@ -169,15 +175,17 @@ function LoginTemplate({ handleSignIn, phone, setPhone = () => { } }) {
         />
 
         {/* Login Button */}
-        <button
-          className="bg-primary hover:bg-red-700 text-white font-semibold py-3 px-6 rounded font-helvetica text-base cursor-pointer"
-          onClick={handleSignIn}
-        >
-          Sign in
-        </button>
+        <div >
+          <button
+            className="bg-primary hover:bg-red-700 text-white font-semibold py-2 px-5 rounded font-helvetica text-base cursor-pointer"
+            onClick={handleSignIn}
+          >
+            Sign in
+          </button>
+        </div>
 
         {/* Version Info */}
-        <p className="text-sm text-primary font-semibold mt-6 font-helvetica">
+        <p className="text-sm text-primary font-semibold font-helvetica">
           Version {VERSION}
         </p>
       </div>
