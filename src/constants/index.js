@@ -3,7 +3,8 @@ export const AUTH = Object.freeze({
   ROLE: 'ROLE',
   ADMIN: "ADMIN",
   NORMAL: "NORMAL",
-  USER: "USER"
+  USER: "USER",
+  PHONE: "PHONE"
 });
 
 

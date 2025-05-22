@@ -11,6 +11,7 @@ import { CHAT_DATA } from '../data';
 import axiosInstance from '../api/axios';
 import Loading from '../components/Loading';
 import { useSelector } from 'react-redux';
+import { AUTH } from '../constants';
 
 dayjs.extend(isBetween);
 
@@ -21,8 +22,10 @@ const QnaHistory = () => {
     const [dateRange, setDateRange] = useState([]);
     const [name, setName] = useState([])
     const [loading, setLoading] = useState(false)
-    const user = useSelector((state) => state.user.value)
-    const phone = user?.mobilePhone
+    // const phone = useSelector((state) => state.user.phone)
+    const phone = sessionStorage.getItem(AUTH.PHONE)
+
+
 
     // fetch chat data
     useEffect(() => {

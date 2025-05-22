@@ -261,6 +261,7 @@ import Breadcrumbs from '../components/Breadcrumb/Breadcrumb';
 import axiosInstance from '../api/axios';
 import Loading from '../components/Loading';
 import { useSelector } from 'react-redux';
+import { AUTH } from '../constants';
 
 const INITIAL_COLUMNS = [
     { field: "emp_code", headerName: "Employee Code", width: 150 },
@@ -275,8 +276,10 @@ const User = () => {
     const [rows, setRows] = useState([]);
     const [searchtext, setsearchtext] = useState("");
     const [loading, setLoading] = useState(false);
-    const user = useSelector((state) => state.user.value)
-    const phone = user?.mobilePhone
+    // const phone = useSelector((state) => state.user.phone)
+    const phone = sessionStorage.getItem(AUTH.PHONE)
+
+
 
     // Fetch user data on mount
     useEffect(() => {

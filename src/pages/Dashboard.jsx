@@ -82,7 +82,7 @@ const Dashboard = () => {
     if (!item) {
       navigate("/")
     }
-    const role = item === AUTH.ADMIN.toLowerCase() ? AUTH.ADMIN : AUTH.USER
+    const role = item === AUTH.ADMIN ? AUTH.ADMIN : AUTH.USER
     const sidebar = role === AUTH.ADMIN ? ADMIN_SIDEBAR : USER_SIDEBAR
     setSideBarProps(sidebar)
   }, [user])

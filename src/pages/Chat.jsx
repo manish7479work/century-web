@@ -9,6 +9,7 @@ import axiosInstance from "../api/axios";
 import Breadcrumbs from "../components/Breadcrumb/Breadcrumb";
 import Loading from "../components/Loading";
 import { useSelector } from "react-redux";
+import { AUTH } from "../constants";
 
 // Extend dayjs
 dayjs.extend(relativeTime);
@@ -19,9 +20,7 @@ const Chat = ({ readOnly = false }) => {
     const bottomRef = useRef(null);
     const [loading, setLoading] = useState(false)
     const [fetchChat, setFetchChat] = useState(false)
-    const user = useSelector((state) => state.user.value)
-    const phone = user?.mobilePhone
-
+    const phone = sessionStorage.getItem(AUTH.PHONE)
     console.log(phone)
 
 

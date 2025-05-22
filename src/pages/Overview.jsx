@@ -22,6 +22,7 @@ import Loading from '../components/Loading';
 import { toast } from 'react-toastify';
 import Chat from './Chat';
 import { useSelector } from 'react-redux';
+import { AUTH } from '../constants';
 
 
 // const initialData = {
@@ -46,8 +47,8 @@ const Overview = () => {
     const [period, setPeriod] = useState("daily")
     const [DATA, setDATA] = useState(initialData)
     const [loading, setLoading] = useState(false)
-    const user = useSelector((state) => state.user.value)
-    const phone = user?.mobilePhone
+    // const phone = useSelector((state) => state.user.phone)
+    const phone = sessionStorage.getItem(AUTH.PHONE)
 
     console.log(phone)
 
