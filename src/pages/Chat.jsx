@@ -21,7 +21,6 @@ const Chat = ({ readOnly = false }) => {
     const [loading, setLoading] = useState(false)
     const [fetchChat, setFetchChat] = useState(false)
     const phone = sessionStorage.getItem(AUTH.PHONE)
-    console.log(phone)
 
 
     useEffect(() => {
@@ -37,7 +36,6 @@ const Chat = ({ readOnly = false }) => {
                 }
                 const { data } = await axiosInstance.post(URL, bodyData);
                 if (isMounted) {
-                    console.log(data);
                     // Optionally set state with data here
                     setChatData(data?.messages ?? [])
                 }

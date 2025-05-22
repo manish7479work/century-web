@@ -111,41 +111,6 @@ const LoginPage = () => {
   };
 
 
-  // const handleSignIn = async () => {
-  //   try {
-  //     if (!phone) {
-  //       toast.warning("Phone Number is Mandatory")
-  //       return
-  //     }
-
-  //     const digits = String(phone).replace(/\D/g, '');
-
-  //     if (digits.length !== 10) {
-  //       toast.warning("Phone No. must be 10 digits");
-  //       return;
-  //     }
-  //     setLoading(true)
-  //     const response = await instance.loginPopup(loginRequest);
-
-  //     const data = await getAccessToken(response?.accessToken, phone);
-  //     if (data) {
-  //       dispatch(addPhone(phone));
-  //       const role = data?.user_role === AUTH.ADMIN.toLowerCase() ? AUTH.ADMIN : AUTH.USER
-  //       sessionStorage.setItem(AUTH.ROLE, role)
-  //       sessionStorage.setItem(AUTH.BEARER_TOKEN, data?.access_token);
-
-  //       navigate("/dashboard"); // Redirect to dashboard
-  //     } else {
-  //       toast.error("Unable to login...");
-  //     }
-  //   } catch (e) {
-  //     toast.error("Login failed. Please try again.");
-  //     console.error("Login failed:", e);
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // };
-
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-white w-screen h-screen bg-cover bg-center"

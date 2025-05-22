@@ -88,67 +88,6 @@ const Dashboard = () => {
   }, [user])
 
 
-  // useEffect(() => {
-  //   // setSideBarProps()
-  //   const fetchRole = async () => {
-  //     try {
-  //       if (user) {
-  //         const URL = "/get_user_role"
-  //         const bodyData = {
-  //           "pno": String(user.phoneNumber),
-  //           "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
-  //         };
-  //         const { data } = await axiosInstance.post(URL, bodyData)
-  //         console.log(data)
-  //         const role = data?.user_role === AUTH.ADMIN.toLowerCase() ? AUTH.ADMIN : AUTH.USER
-  //         const sidebar = role === AUTH.ADMIN ? ADMIN_SIDEBAR : USER_SIDEBAR
-  //         setSideBarProps(sidebar)
-  //         sessionStorage.setItem(AUTH.ROLE, role)
-  //       }
-  //     } catch (error) {
-  //       console.log(error)
-  //       toast.error("Something went wrong..")
-  //       sessionStorage.removeItem(AUTH.BEARER_TOKEN)
-  //       navigate("/")
-
-  //     }
-  //   }
-
-  //   fetchRole()
-
-  // }, [user])
-
-
-  // useEffect(() => {
-  //   const fetchRole = async () => {
-  //     console.log(user)
-  //     if (!user?.mobilePhone) return;
-
-  //     try {
-  //       const URL = "/get_user_role";
-  //       const bodyData = {
-  //         pno: String(user.mobilePhone),
-  //         uid: "c9b1a069-2e1e-4138-adac-b7935e769ac6", // consider making UID dynamic
-  //       };
-
-  //       const { data } = await axiosInstance.post(URL, bodyData);
-  //       console.log("User role data:", data);
-
-  //       const role = data?.role || AUTH.USER; // fallback to USER if role not returned
-  //       const sidebar = role === AUTH.ADMIN ? ADMIN_SIDEBAR : USER_SIDEBAR;
-
-  //       sessionStorage.setItem(AUTH.ROLE, role);
-  //       setSideBarProps(sidebar);
-  //     } catch (error) {
-  //       console.error("Failed to fetch user role:", error);
-  //     }
-  //   };
-
-  //   fetchRole();
-  // }, [user]);
-
-
-
 
   // fetch user profile details
   useEffect(() => {
