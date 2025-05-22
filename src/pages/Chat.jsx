@@ -104,11 +104,12 @@ const Chat = ({ readOnly = false }) => {
     }, [chatData, fetchChat]);
 
     return (
-        <div className="flex flex-col h-full w-full gap-2">
+        <div className="flex flex-col h-full w-full gap-1">
             {loading && <Loading />}
             {!readOnly && (<Breadcrumbs />)}
+            {/* <hr /> */}
 
-            <div className="h-full overflow-y-auto bg-white p-2">
+            <div className="h-full overflow-y-auto bg-white  p-2">
                 {chatData.length > 0 ? (
                     <>
                         {chatData.map((item, idx) => (
@@ -129,8 +130,8 @@ const Chat = ({ readOnly = false }) => {
 
                 <div ref={bottomRef} />
 
+                <PromptField readOnly={readOnly} handleSubmit={handleSubmit} prompt={prompt} setPrompt={setPrompt} />
             </div>
-            <PromptField readOnly={readOnly} handleSubmit={handleSubmit} prompt={prompt} setPrompt={setPrompt} />
         </div>
     );
 };

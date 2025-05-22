@@ -3,7 +3,7 @@ import { AUTH } from '../constants';
 
 const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_URL, // Store this in .env
-    timeout: 50000, // 10 seconds
+    timeout: 600000, // 10 seconds
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
