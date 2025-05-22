@@ -35,7 +35,7 @@ const AppRouter = () => {
         <Route path={PROTECTED_ROUTES.DASHBOARD} element={<Dashboard />}>
           <Route index element={<Navigate to={toOverview ? 'overview' : 'chat'} replace />} />
           <Route path="chat" element={<Chat />} />
-          {toOverview && (
+          {(role === AUTH.ADMIN || !role) && (
             <>
               <Route path="overview" element={<Overview />} />
               <Route path="qna-history" element={<QnaHistory />} />
