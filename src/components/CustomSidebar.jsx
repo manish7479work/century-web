@@ -1,5 +1,5 @@
 import { Sidebar, Menu, MenuItem, sidebarClasses, SubMenu } from 'react-pro-sidebar';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import { IoMenu } from "react-icons/io5";
 import { Button, IconButton } from '@mui/material';
@@ -22,6 +22,7 @@ const CustomSidebar = ({ sidebarData }) => {
     const [loading, setLoading] = useState(false)
     const dispatch = useDispatch()
     const user = useSelector((state) => state.user.value)
+    const navigate = useNavigate()
 
     const x = user?.displayName ?? "Devloper ."
     let logedInUserName;
@@ -31,33 +32,12 @@ const CustomSidebar = ({ sidebarData }) => {
         logedInUserName = x;
     }
 
-    // // fetch user details and store into the store
-    // useEffect(() => {
-    //     if (accounts.length > 0) {
-    //         instance
-    //             .initialize() // Important: initialize if you're using MSAL v3+
-    //             .then(() => {
-    //                 return instance.acquireTokenSilent({
-    //                     ...loginRequest,
-    //                     account: accounts[0],
-    //                 });
-    //             })
-    //             .then((response) => {
-    //                 return callMsGraph(response.accessToken);
-    //             })
-    //             .then((data) => dispatch(addUser(data)))
-    //             .catch((error) => console.error("Token acquisition or Graph call failed:", error));
-    //     }
-    // }, [instance, accounts]);
-
     const handleLogout = useCallback(async () => {
         setLoading(true);
-        const options = { postLogoutRedirectUri: "/" };
-
         try {
             // Clear sessionStorage first
             sessionStorage.clear();
-            await instance.logoutPopup({ ...options, mainWindowRedirectUri: "/" });
+            navigate("/")
 
         } catch (error) {
             console.error("Logout failed:", error);
