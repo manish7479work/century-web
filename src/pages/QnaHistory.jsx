@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { convertToISO, extractColumns } from '../utils/helper';
 import Select from 'react-select';
 import DataGridWithPadding from '../components/Form/DataGridWithPadding';
@@ -7,11 +7,13 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import Breadcrumbs from '../components/Breadcrumb/Breadcrumb';
 import MyDatePicker from '../components/Form/MyDatePicker';
-import { CHAT_DATA } from '../data';
+import { CHAT_DATA, DUMMY_CHAT, USER_CHAT_DATA } from '../data';
 import axiosInstance from '../api/axios';
 import Loading from '../components/Loading';
 import { useSelector } from 'react-redux';
 import { AUTH } from '../constants';
+import MyChat from '../components/MyChat';
+import ChatMessage from '../components/ChatMessage';
 
 dayjs.extend(isBetween);
 
@@ -25,7 +27,15 @@ const QnaHistory = () => {
     // const phone = useSelector((state) => state.user.phone)
     const phone = sessionStorage.getItem(AUTH.PHONE)
 
+    const bottomRef = useRef(null);
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 50); // Delay to allow Markdown to render
+
+        return () => clearTimeout(timer);
+    }, [DUMMY_CHAT]);
 
     // fetch chat data
     useEffect(() => {
@@ -85,7 +95,23 @@ const QnaHistory = () => {
             {loading && <Loading />}
             <Breadcrumbs />
             <Filter options={options} selectedOption={selectedOption} setName={setName} setDateRange={setDateRange} />
-            <DataGridWithPadding rows={filteredResults} columns={columns} />
+            <div className='flex-1 overflow-auto'>
+                <div className="h-full overflow-y-auto bg-white  p-2">
+                    {DUMMY_CHAT.map((item, idx) => (
+                        <ChatMessage
+                            key={idx}
+                            type={item.sender}
+                            text={item.message}
+                            timestamp={item.timestamp}
+                            feedback={item.feedback}
+
+                        />
+                    ))}
+
+                    <div ref={bottomRef} />
+                </div>
+            </div>
+
         </div>
     );
 };

@@ -349,3 +349,182 @@ export const CHAT_DATA = [
     }
 ]
 
+
+export const DUMMY_CHAT = [
+    {
+        "sender": "user",
+        "message": "Hello there!",
+        "timestamp": "2025-05-23T09:00:00.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Hi! How can I help you today?",
+        "timestamp": "2025-05-23T09:00:05.000000",
+        "feedback": "Very responsive and friendly greeting."
+    },
+    {
+        "sender": "user",
+        "message": "Can you tell me about marine plywood?",
+        "timestamp": "2025-05-23T09:00:10.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Sure! Marine plywood is water-resistant and ideal for moisture-prone areas. Need pricing or availability?",
+        "timestamp": "2025-05-23T09:00:15.000000",
+        "feedback": "Clear and informative answer."
+    },
+    {
+        "sender": "user",
+        "message": "Is there any ongoing discount or scheme?",
+        "timestamp": "2025-05-23T09:00:20.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Yes, there is a 10% discount on selected Century Plyboards. Would you like the details?",
+        "timestamp": "2025-05-23T09:00:25.000000",
+        "feedback": "Prompt response with useful info."
+    },
+    {
+        "sender": "user",
+        "message": "Thanks, that was helpful.",
+        "timestamp": "2025-05-23T09:00:30.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "You're welcome! Feel free to reach out anytime.",
+        "timestamp": "2025-05-23T09:00:35.000000",
+        "feedback": "Polite and welcoming closure."
+    },
+    {
+        "sender": "user",
+        "message": "Hello there!",
+        "timestamp": "2025-05-23T09:00:00.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Hi! How can I help you today?",
+        "timestamp": "2025-05-23T09:00:05.000000",
+        "feedback": "Very responsive and friendly greeting."
+    },
+    {
+        "sender": "user",
+        "message": "Can you tell me about marine plywood?",
+        "timestamp": "2025-05-23T09:00:10.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Sure! Marine plywood is water-resistant and ideal for moisture-prone areas. Need pricing or availability?",
+        "timestamp": "2025-05-23T09:00:15.000000",
+        "feedback": "Clear and informative answer."
+    },
+    {
+        "sender": "user",
+        "message": "Is there any ongoing discount or scheme?",
+        "timestamp": "2025-05-23T09:00:20.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Yes, there is a 10% discount on selected Century Plyboards. Would you like the details?",
+        "timestamp": "2025-05-23T09:00:25.000000",
+        "feedback": "Prompt response with useful info."
+    },
+    {
+        "sender": "user",
+        "message": "Thanks, that was helpful.",
+        "timestamp": "2025-05-23T09:00:30.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "You're welcome! Feel free to reach out anytime.",
+        "timestamp": "2025-05-23T09:00:35.000000",
+        "feedback": "Polite and welcoming closure."
+    }, {
+        "sender": "user",
+        "message": "Hello there!",
+        "timestamp": "2025-05-23T09:00:00.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Hi! How can I help you today?",
+        "timestamp": "2025-05-23T09:00:05.000000",
+        "feedback": "Very responsive and friendly greeting."
+    },
+    {
+        "sender": "user",
+        "message": "Can you tell me about marine plywood?",
+        "timestamp": "2025-05-23T09:00:10.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Sure! Marine plywood is water-resistant and ideal for moisture-prone areas. Need pricing or availability?",
+        "timestamp": "2025-05-23T09:00:15.000000",
+        "feedback": "Clear and informative answer."
+    },
+    {
+        "sender": "user",
+        "message": "Is there any ongoing discount or scheme?",
+        "timestamp": "2025-05-23T09:00:20.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Yes, there is a 10% discount on selected Century Plyboards. Would you like the details?",
+        "timestamp": "2025-05-23T09:00:25.000000",
+        "feedback": "Prompt response with useful info."
+    },
+    {
+        "sender": "user",
+        "message": "Thanks, that was helpful.",
+        "timestamp": "2025-05-23T09:00:30.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "You're welcome! Feel free to reach out anytime.",
+        "timestamp": "2025-05-23T09:00:35.000000",
+        "feedback": "Polite and welcoming closure."
+    }, {
+        "sender": "user",
+        "message": "Hello there!",
+        "timestamp": "2025-05-23T09:00:00.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Hi! How can I help you today?",
+        "timestamp": "2025-05-23T09:00:05.000000",
+        "feedback": "Very responsive and friendly greeting."
+    },
+    {
+        "sender": "user",
+        "message": "Can you tell me about marine plywood?",
+        "timestamp": "2025-05-23T09:00:10.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Sure! Marine plywood is water-resistant and ideal for moisture-prone areas. Need pricing or availability?",
+        "timestamp": "2025-05-23T09:00:15.000000",
+        "feedback": "Clear and informative answer."
+    },
+    {
+        "sender": "user",
+        "message": "Is there any ongoing discount or scheme?",
+        "timestamp": "2025-05-23T09:00:20.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "Yes, there is a 10% discount on selected Century Plyboards. Would you like the details?",
+        "timestamp": "2025-05-23T09:00:25.000000",
+        "feedback": "Prompt response with useful info."
+    },
+    {
+        "sender": "user",
+        "message": "Thanks, that was helpful.",
+        "timestamp": "2025-05-23T09:00:30.000000"
+    },
+    {
+        "sender": "assistant",
+        "message": "You're welcome! Feel free to reach out anytime.",
+        "timestamp": "2025-05-23T09:00:35.000000",
+        "feedback": "Polite and welcoming closure."
+    }
+]
+
+
