@@ -38,7 +38,7 @@ const AppRouter = () => {
           {(role === AUTH.ADMIN || !role) && (
             <>
               <Route path="overview" element={<Overview />} />
-              <Route path="qna-history" element={<QnaHistory />} />
+              <Route path="qna-history/:pno?" element={<QnaHistory />} />
               <Route path="user" element={<User />} />
             </>
           )}

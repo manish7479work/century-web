@@ -44,37 +44,72 @@ export function convertToISO(dateString) {
     const date = new Date(dateString);
     return date.toISOString(); // returns in ISO 8601 format
 }
-
-
 export const fillMonthlyData = (inputData = []) => {
     const result = [];
-
     if (inputData.length === 0) return result;
 
-    // Extract year and month from the first input record
-    const [year, month] = inputData[0].query_timestamp.split("-").map(Number);
-    const daysInMonth = new Date(year, month, 0).getDate(); // month is 1-indexed here
+    const getDateParts = (record) => {
+        const dateStr = record.query_timestamp ?? record.month;
+        const [y, m] = dateStr.split("T")[0].split("-");
+        return [parseInt(y), parseInt(m)];
+    };
 
-    // Create a map from inputData for quick lookup
-    const inputMap = new Map(
-        inputData.map(item => [item.query_timestamp, item.count])
+    const [year, month] = getDateParts(inputData[0]);
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    const dateCountMap = new Map(
+        inputData.map(item => {
+            const date = (item?.query_timestamp ?? item?.month).split("T")[0];
+            return [date, item.count ?? item.total];
+        })
     );
 
-    // Fill in the full month
+    console.log(dateCountMap)
+
     for (let day = 1; day <= daysInMonth; day++) {
         const dayStr = String(day).padStart(2, "0");
         const monthStr = String(month).padStart(2, "0");
-        const formatted = `${year}-${monthStr}-${dayStr}`;
+        const currentDateStr = `${year}-${monthStr}-${dayStr}`;
 
         result.push({
-            // name: formatted,
-            name: dayStr, // uncomment if you only want day number
-            count: inputMap.get(formatted) || 0
+            name: dayStr, // or use currentDateStr if needed
+            count: dateCountMap.get(currentDateStr) || 0
         });
     }
 
     return result;
 };
+
+
+// export const fillMonthlyData = (inputData = []) => {
+//     const result = [];
+
+//     if (inputData.length === 0) return result;
+
+//     // Extract year and month from the first input record
+//     const [year, month] = inputData[0].query_timestamp.split("-").map(Number);
+//     const daysInMonth = new Date(year, month, 0).getDate(); // month is 1-indexed here
+
+//     // Create a map from inputData for quick lookup
+//     const inputMap = new Map(
+//         inputData.map(item => [item.query_timestamp.split("T")[0], item.count])
+//     );
+
+//     // Fill in the full month
+//     for (let day = 1; day <= daysInMonth; day++) {
+//         const dayStr = String(day).padStart(2, "0");
+//         const monthStr = String(month).padStart(2, "0");
+//         const formatted = `${year}-${monthStr}-${dayStr}`;
+
+//         result.push({
+//             // name: formatted,
+//             name: dayStr, // uncomment if you only want day number
+//             count: inputMap.get(formatted) || 0
+//         });
+//     }
+
+//     return result;
+// };
 
 export const fillYearlyData = (inputData = []) => {
     const result = [];
@@ -154,4 +189,73 @@ export const fillYearlyData = (inputData = []) => {
 //     return result;
 // };
 
+export function getMonthsToJanuary() {
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    const currentMonth = new Date().getMonth(); // 0-based index
+    const months = [];
+
+    for (let i = currentMonth; i >= 0; i--) {
+        months.push({
+            month: monthNames[i],
+            number: i + 1
+        });
+    }
+
+    return months;
+}
+
+export function isDateRangeWithInTheTarget(startDate, endDate, target) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Get time difference in milliseconds
+    const timeDiff = end - start;
+
+    // Convert to days
+    const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+    return dayDiff <= target;
+}
+
+export function getDaysInCurrentMonth() {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+}
+
+
+
+// export function getMonthDateRange(month) {
+//     if (!month) return
+//     const year = new Date().getFullYear(); // Use current year
+
+//     // JS month is 0-based: Jan = 0, so subtract 1
+//     const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
+//     const endDate = new Date(Date.UTC(year, month, 1, 0, 0, 0)); // First day of next month
+
+//     return {
+//         start_date: startDate.toISOString(),
+//         end_date: endDate.toISOString()
+//     };
+// }
+
+export function getMonthDateRange(month) {
+    const year = new Date().getFullYear();
+
+    // Ensure the input is a valid number between 1 and 12
+    if (!Number.isInteger(month) || month < 1 || month > 12) {
+        throw new Error("Month must be an integer between 1 and 12");
+    }
+
+    const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
+    const endDate = new Date(Date.UTC(year, month, 1, 0, 0, 0)); // First day of next month
+
+    return {
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString()
+    };
+}
 

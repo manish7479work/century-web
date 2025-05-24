@@ -9,7 +9,7 @@ import {
     ResponsiveContainer,
 } from "recharts"
 
-const MyBarChart = ({ title, data = [] }) => {
+const MyBarChart = ({ title, data = [], color = "#E30613" }) => {
     return (
         <div className="p-4 bg-white w-full rounded-md shadow-sm border-2 border-solid">
             <div className="flex justify-between items-center mb-4">
@@ -26,7 +26,7 @@ const MyBarChart = ({ title, data = [] }) => {
                             allowDecimals={false} />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey={title} fill="#E30613" />
+                        <Bar dataKey={title} fill={color} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>

@@ -105,7 +105,7 @@ const Chat = ({ readOnly = false }) => {
     }, [chatData, fetchChat]);
 
     return (
-        <div className="flex flex-col h-full w-full gap-1">
+        <div className="flex flex-col h-full w-full gap-1 overflow-y-auto">
             {loading && <Loading />}
             {!readOnly && (<Breadcrumbs />)}
             {/* <hr /> */}
