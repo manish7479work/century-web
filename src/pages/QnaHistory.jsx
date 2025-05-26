@@ -102,7 +102,7 @@ const QnaHistory = () => {
                 initialPnoRef.current = effectivePno;
             }
 
-            let period = "daily";
+            // let period = "daily";
 
             console.log(initialPnoRef)
 
@@ -118,13 +118,7 @@ const QnaHistory = () => {
                     endDate.setDate(endDate.getDate() + 1);
                     end_time = convertToISO(endDate);
 
-                    const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-                    period = isDateRangeWithInTheTarget(start_time, end_time, daysInCurrentMonth + 1)
-                    if (!period) {
-                        setInterval(5)
-                    } else {
-                        setInterval(2);
-                    }
+
                 }
 
                 const bodyData = {
@@ -140,6 +134,14 @@ const QnaHistory = () => {
 
                 const mode = data?.analytics_data?.mode || "daily";
 
+                const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+                let t = isDateRangeWithInTheTarget(start_time, end_time, daysInCurrentMonth + 1)
+                if (!t && mode === "daily") {
+                    setInterval(5)
+                } else {
+                    setInterval(2);
+                }
+
                 const usageData = mode === "daily"
                     ? (PNO || !(dateRange.length > 0 && dateRange[0])) ? fillMonthlyData(data.analytics_data.usage) : mapDailyTotalsInRange(start_time, end_time, data?.analytics_data?.usage)
                     : fillYearlyData(data.analytics_data.usage);
@@ -147,6 +149,8 @@ const QnaHistory = () => {
                 const errorRateData = mode === "daily"
                     ? (PNO && !(dateRange.length > 0 && dateRange[0])) ? fillMonthlyData(data.analytics_data.error_data) : mapDailyTotalsInRange(start_time, end_time, data?.analytics_data?.usage)
                     : fillYearlyData(data.analytics_data.error_data);
+
+                console.log(errorRateData)
 
                 setData(prev => ({
                     ...prev,

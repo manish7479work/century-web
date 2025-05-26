@@ -138,16 +138,6 @@ const Overview = () => {
                 endDate.setDate(endDate.getDate() + 1);
                 end_time = convertToISO(endDate);
 
-
-                // const mode = (isDateRangeWithInTheTarget(start_time, end_time, targetDays + 1)) ? "daily" : "monthly";
-                const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-                const check = isDateRangeWithInTheTarget(start_time, end_time, daysInCurrentMonth + 1)
-                if (!check) {
-                    setInterval(5)
-                } else {
-                    setInterval(2);
-                }
-
                 const bodyData = {
                     "pno": String(phone),
                     "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
@@ -158,6 +148,13 @@ const Overview = () => {
                 const { data } = await axiosInstance.post(URL, bodyData)
 
                 const mode = data?.data?.mode
+                const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+                let t = isDateRangeWithInTheTarget(start_time, end_time, daysInCurrentMonth + 1)
+                if (!t && mode === "daily") {
+                    setInterval(5)
+                } else {
+                    setInterval(2);
+                }
 
                 const usageData = mode === "daily" ? mapDailyTotalsInRange(start_time, end_time, data?.data?.usage) : fillYearlyData(data?.data?.usage)
                 const uniqueVisitorData = mode === "daily" ? mapDailyTotalsInRange(start_time, end_time, data?.data?.unique_users) : fillYearlyData(data?.data?.unique_users)
