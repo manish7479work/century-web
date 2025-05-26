@@ -46,7 +46,17 @@ export function convertToISO(dateString) {
 }
 export const fillMonthlyData = (inputData = []) => {
     const result = [];
-    if (inputData.length === 0) return result;
+    if (inputData.length === 0) {
+        for (let day = 1; day <= daysInCurrentMonth; day++) {
+
+            result.push({
+                name: day, // or use currentDateStr if needed
+                count: 0
+            });
+        }
+
+        return result
+    };
 
     const getDateParts = (record) => {
         const dateStr = record.query_timestamp ?? record.month;
@@ -63,8 +73,6 @@ export const fillMonthlyData = (inputData = []) => {
             return [date, item.count ?? item.total];
         })
     );
-
-    console.log(dateCountMap)
 
     for (let day = 1; day <= daysInMonth; day++) {
         const dayStr = String(day).padStart(2, "0");
@@ -113,7 +121,17 @@ export const fillMonthlyData = (inputData = []) => {
 
 export const fillYearlyData = (inputData = []) => {
     const result = [];
-    if (inputData.length === 0) return result;
+    if (inputData.length === 0) {
+        for (let day = 1; day <= 12; day++) {
+
+            result.push({
+                name: day, // or use currentDateStr if needed
+                count: 0
+            });
+        }
+
+        return result
+    };
 
     // Helper function to extract year-month from available fields
     const extractYearMonth = (item) => {
@@ -259,3 +277,174 @@ export function getMonthDateRange(month) {
     };
 }
 
+export const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+
+
+export function isSameMonth(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    return start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear();
+}
+
+
+// generate date range between two dates
+export function generateDateRange(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const dateArray = [];
+
+    let currentDate = new Date(start);
+
+    while (currentDate <= end) {
+        dateArray.push({
+            date: currentDate.toISOString().split('T')[0]
+        });
+
+        // Move to the next day
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dateArray;
+}
+
+// export function mapCountsToDateRange(startDate, endDate, inputArray) {
+//     const start = new Date(startDate);
+//     const end = new Date(endDate);
+//     const result = [];
+
+//     let currentDate = new Date(start);
+
+//     while (currentDate <= end) {
+//         const currentMonth = currentDate.getMonth();
+//         const currentYear = currentDate.getFullYear();
+
+//         const dailyData = inputArray.map(item => {
+//             const queryDate = new Date(item.query_timestamp);
+//             const queryMonth = queryDate.getMonth();
+//             const queryYear = queryDate.getFullYear();
+
+//             return {
+//                 count: (currentMonth === queryMonth && currentYear === queryYear) ? item.count : 0,
+//                 query_timestamp: queryDate.toISOString()
+//             };
+//         });
+
+//         result.push(...dailyData);
+
+//         currentDate.setDate(currentDate.getDate() + 1);
+//     }
+
+//     return result;
+// }
+
+export function mapCountsToDateRange(startDate, endDate, inputArray) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const result = [];
+
+    let currentDate = new Date(start);
+
+    while (currentDate <= end) {
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+        const currentDay = currentDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+
+        const dailyData = inputArray.map(item => {
+            const queryDate = new Date(item.query_timestamp);
+            const queryMonth = queryDate.getMonth();
+            const queryYear = queryDate.getFullYear();
+
+            if (currentMonth === queryMonth && currentYear === queryYear) {
+                // Get number of days in the query month
+                const daysInMonth = new Date(queryYear, queryMonth + 1, 0).getDate();
+                return {
+                    date: currentDay,
+                    count: item.count / daysInMonth,
+                    query_timestamp: queryDate.toISOString()
+                };
+            } else {
+                return {
+                    date: currentDay,
+                    count: 0,
+                    query_timestamp: queryDate.toISOString()
+                };
+            }
+        });
+
+        result.push(...dailyData);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return result;
+}
+
+
+// export function mapDailyTotalsInRange(startDate, endDate, inputArray = []) {
+//     const start = new Date(startDate);
+//     const end = new Date(endDate);
+//     const result = [];
+
+//     // Prevent reduce error if inputArray is undefined/null
+//     const totalMap = (inputArray || []).reduce((map, item) => {
+//         map[item.month] = item.total;
+//         return map;
+//     }, {});
+
+//     console.log(totalMap)
+
+//     let currentDate = new Date(start);
+
+//     while (currentDate <= end) {
+//         const dateStr = currentDate.toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+//         result.push({
+
+//             name: dateStr.split('-')[2], // Extract day from "YYYY-MM-DD"
+//             count: totalMap[dateStr] || 0
+//         });
+
+//         currentDate.setDate(currentDate.getDate() + 1);
+//     }
+
+//     return result;
+// }
+
+
+export function mapDailyTotalsInRange(startDate, endDate, inputArray = []) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const result = [];
+
+    // Normalize input into a { [dateString]: count } map
+    const totalMap = {};
+
+    inputArray.forEach(item => {
+        const dateStr =
+            item.month?.split("T")[0] ||
+            item.query_timestamp?.split("T")[0] ||
+            "";
+
+        const count = item.total ?? item.count ?? 0;
+
+        if (dateStr) {
+            totalMap[dateStr] = (totalMap[dateStr] || 0) + count;
+        }
+    });
+
+    let currentDate = new Date(start);
+
+    while (currentDate <= end) {
+        const dateStr = currentDate.toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+        result.push({
+            name: dateStr.split('-')[2], // Extract day
+            count: totalMap[dateStr] || 0
+        });
+
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return result;
+}

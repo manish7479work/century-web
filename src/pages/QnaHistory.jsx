@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { convertToISO, extractColumns, fillMonthlyData, fillYearlyData } from '../utils/helper';
+import { convertToISO, daysInCurrentMonth, extractColumns, fillMonthlyData, fillYearlyData, isDateRangeWithInTheTarget, isSameMonth, mapDailyTotalsInRange } from '../utils/helper';
 import Select from 'react-select';
 import DataGridWithPadding from '../components/Form/DataGridWithPadding';
 import { DatePicker } from "antd";
@@ -34,13 +34,11 @@ const QnaHistory = () => {
     const [phoneNumber, setPhoneNumber] = useState(null)
     const [loading, setLoading] = useState(false)
     // const phone = useSelector((state) => state.user.phone)
+    const [selectedData, setSelectedData] = useState(null)
     const phone = sessionStorage.getItem(AUTH.PHONE)
     const [users, setUsers] = useState([])
     const [data, setData] = useState(initialData)
-
-
     const PNO = useParams().pno;
-
     const bottomRef = useRef(null);
 
     useEffect(() => {
@@ -50,7 +48,6 @@ const QnaHistory = () => {
 
         return () => clearTimeout(timer);
     }, [DUMMY_CHAT]);
-
 
     // fetch last 24 hours, user details that access the application
     useEffect(() => {
@@ -90,13 +87,84 @@ const QnaHistory = () => {
     }, []);
 
     // fetch data on the basis of pno
+    // useEffect(() => {
+    //     (async () => {
+    //         const URL = "/get_user_analytics";
+    //         if (!PNO && !selectedData) return
+    //         // if (!phoneNumber) return
+
+    //         let period = "daily"
+
+    //         try {
+    //             setLoading(true);
+    //             let start_time = null;
+    //             let end_time = null;
+
+    //             if (dateRange.length > 0 && dateRange[0]) {
+    //                 start_time = convertToISO(dateRange[0]);
+
+    //                 // const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+    //                 period = isDateRangeWithInTheTarget(start_time, end_time, daysInCurrentMonth) ? "daily" : "monthly"
+
+    //                 // Add one day to dateRange[1]
+    //                 const endDate = new Date(dateRange[1]);
+    //                 endDate.setDate(endDate.getDate() + 1);
+    //                 end_time = convertToISO(endDate);
+    //             }
+    //             const bodyData = {
+    //                 "pno": PNO ?? selectedData.pno,
+    //                 "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
+    //                 start_time,
+    //                 end_time,
+    //             };
+
+    //             const { data } = await axiosInstance.post(URL, bodyData);
+
+    //             const usageData = period === "daily" ? fillMonthlyData(data.analytics_data.usage) : fillYearlyData(data.analytics_data.usage)
+    //             const errorRateData = period === "daily" ? fillMonthlyData(data.analytics_data.error_data) : fillYearlyData(data.analytics_data.error_data)
+    //             // const uniqueVisitorData = period === "daily" ? fillMonthlyData(uniqueVisitors?.data.unique_users_data) : fillYearlyData(uniqueVisitors?.data.unique_users_data)
+
+    //             setData(prev => ({
+    //                 ...prev,
+    //                 usage: usageData.map(item => ({
+    //                     name: item.name,
+    //                     Usage: item.count
+    //                 })),
+    //                 average: [],
+    //                 errorRate: errorRateData.map(item => ({
+    //                     name: item.name,
+    //                     "Error Rate": item.count
+    //                 })),
+    //                 chatData: data.chat_data
+    //             }));
+
+    //             setSelectedData(data.user_data)
+
+    //         } catch (error) {
+    //             console.error(error);
+    //             toast.error("Someting went wrong")
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     })();
+    // }, [PNO, selectedData, dateRange]);
+
+    const initialPnoRef = useRef(null);
+
     useEffect(() => {
         (async () => {
             const URL = "/get_user_analytics";
-            if (!PNO && !phoneNumber) return
-            // if (!phoneNumber) return
 
-            let period = "daily"
+            const effectivePno = PNO ?? selectedData?.pno;
+            if (!effectivePno) return;
+
+            // Cache PNO for consistent reference to avoid re-runs
+            if (!initialPnoRef.current) {
+                initialPnoRef.current = effectivePno;
+            }
+
+            let period = "daily";
+
             try {
                 setLoading(true);
                 let start_time = null;
@@ -104,24 +172,33 @@ const QnaHistory = () => {
 
                 if (dateRange.length > 0 && dateRange[0]) {
                     start_time = convertToISO(dateRange[0]);
-
-                    // Add one day to dateRange[1]
                     const endDate = new Date(dateRange[1]);
                     endDate.setDate(endDate.getDate() + 1);
                     end_time = convertToISO(endDate);
+
+                    const sameMonth = isSameMonth(start_time, end_time - 1);
+                    const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+                    period = (isDateRangeWithInTheTarget(start_time, end_time, daysInCurrentMonth + 1) && sameMonth) ? "daily" : "monthly";
                 }
+
                 const bodyData = {
-                    "pno": PNO ?? phoneNumber,
-                    "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
+                    pno: initialPnoRef.current,
+                    uid: "c9b1a069-2e1e-4138-adac-b7935e769ac6", // Replace with dynamic UID if possible
                     start_time,
                     end_time,
                 };
 
                 const { data } = await axiosInstance.post(URL, bodyData);
 
-                const usageData = period === "daily" ? fillMonthlyData(data.analytics_data.usage) : fillYearlyData(data.analytics_data.usage)
-                const errorRateData = period === "daily" ? fillMonthlyData(data.analytics_data.error_data) : fillYearlyData(data.analytics_data.error_data)
-                // const uniqueVisitorData = period === "daily" ? fillMonthlyData(uniqueVisitors?.data.unique_users_data) : fillYearlyData(uniqueVisitors?.data.unique_users_data)
+                const mode = data?.analytics_data?.mode || "daily";
+
+                const usageData = mode === "daily"
+                    ? (PNO || !(dateRange.length > 0 && dateRange[0])) ? fillMonthlyData(data.analytics_data.usage) : mapDailyTotalsInRange(start_time, end_time, data?.analytics_data?.usage)
+                    : fillYearlyData(data.analytics_data.usage);
+
+                const errorRateData = mode === "daily"
+                    ? (PNO && !(dateRange.length > 0 && dateRange[0])) ? fillMonthlyData(data.analytics_data.error_data) : mapDailyTotalsInRange(start_time, end_time, data?.analytics_data?.usage)
+                    : fillYearlyData(data.analytics_data.error_data);
 
                 setData(prev => ({
                     ...prev,
@@ -137,98 +214,82 @@ const QnaHistory = () => {
                     chatData: data.chat_data
                 }));
 
+                // Only set once to avoid looping
+                if (!selectedData) {
+                    setSelectedData(data.user_data);
+                }
+
             } catch (error) {
                 console.error(error);
-                toast.error("Someting went wrong")
+                toast.error("Something went wrong");
             } finally {
                 setLoading(false);
             }
         })();
-    }, [PNO, phoneNumber, dateRange]);
+    }, [PNO, selectedData, dateRange]);
 
     let filteredResults = users
-    if (phoneNumber) {
-        filteredResults = filteredResults.filter((row) => row.pno.includes(phoneNumber))
+    if (selectedData) {
+        filteredResults = filteredResults.filter((row) => row.pno.includes(selectedData.pno))
     }
 
     const options = users.map((record) => ({
         label: `${record.name} <${record.emp_code}>`,
-        value: record.pno,
+        value: record,
     }));
 
-    const selectedOption = options.find(option => option.value === phoneNumber) || null;
+    const selectedOption = options.find(option => option.value.pno === selectedData?.pno) || null;
 
-    // console.dir(data)
+
+    const USER_DATA_PREVIEW = [
+        {
+            title: "Emp Number:",
+            value: selectedData?.emp_code || selectedData?.employee_code || "Not Available"
+        },
+        {
+            title: "Name:",
+            value: selectedData?.name ?? "Not Available"
+        },
+        {
+            title: "Phone Number:",
+            value: selectedData?.pno || selectedData?.phone || "Not Available"
+        },
+        {
+            title: "Territory Code:",
+            value: selectedData?.territory_code ?? "Not Available"
+        },
+    ]
+
     return (
-        // <div className='h-full w-full flex flex-col gap-2'>
-        //     {loading && <Loading />}
-        //     <Breadcrumbs />
-        //     <Filter options={options} selectedOption={selectedOption} setName={setName} setDateRange={setDateRange} />
-        //     <div className='h-full overflow-auto flex gap-2 flex-col'>
-        //         <div className='flex gap-2'>
-        //             <MyBarChart title={"Usage"} data={[]} period={"monthly"} />
-        //             <MyBarChart title={"Usage"} data={[]} period={"monthly"} />
-        //             <MyBarChart title={"Usage"} data={[]} period={"monthly"} />
-
-        //         </div>
-
-        //         {/* <div className='h-full '> */}
-        //         <div className='bg-gray-100 py-1 rounded-md px-2'>
-        //             <h1 className="font-bold text-2xl relative inline-block">
-        //                 CHATS
-        //                 <div className="h-[2px] bg-primary w-[80%] mt-1 mx-auto"></div>
-        //             </h1>
-        //         </div>
-
-        //         <div className="h-full overflow-y-auto bg-white  p-2">
-        //             {DUMMY_CHAT.map((item, idx) => (
-        //                 <ChatMessage
-        //                     key={idx}
-        //                     type={item.sender}
-        //                     text={item.message}
-        //                     timestamp={item.timestamp}
-        //                     feedback={item.feedback}
-
-        //                 />
-        //             ))}
-
-        //             <div ref={bottomRef} />
-        //         </div>
-        //         {/* </div> */}
-        //     </div>
-        //     {/* <div className='flex-1 overflow-auto'>
-        //         <div className="h-full overflow-y-auto bg-white  p-2">
-        //             {DUMMY_CHAT.map((item, idx) => (
-        //                 <ChatMessage
-        //                     key={idx}
-        //                     type={item.sender}
-        //                     text={item.message}
-        //                     timestamp={item.timestamp}
-        //                     feedback={item.feedback}
-
-        //                 />
-        //             ))}
-
-        //             <div ref={bottomRef} />
-        //         </div>
-        //     </div> */}
-
-        // </div>
-
         <div className="h-full w-full flex flex-col gap-2">
             {loading && <Loading />}
             <Breadcrumbs />
-            <Filter
+
+            {!PNO && <Filter
                 options={options}
                 selectedOption={selectedOption}
-                setName={setPhoneNumber}
+                setName={setSelectedData}
                 setDateRange={setDateRange}
-            />
+            />}
+
 
             {/* This part takes remaining space and scrolls */}
             {
-                (PNO || phoneNumber) && (
+                (PNO || selectedData) && (
                     <div className="flex-1 overflow-auto flex flex-col gap-2">
+                        <div className='sticky top-0 z-10  inline-block bg-white'>
+                            <div className='flex justify-between px-2 border-2 border-solid border-gray-300 py-2 rounded-md'>
+                                {
+                                    USER_DATA_PREVIEW.map((record, idx) => (
+                                        <div key={idx} className='flex gap-2'>
+                                            <p className='font-semibold'>{record.title}</p>
+                                            <p>{record.value}</p>
+                                        </div>
+                                    ))
+                                }
+
+                            </div>
+                        </div>
                         {/* Bar charts container (non-sticky) */}
                         <div className="flex gap-2 ">
                             <MyBarChart title={"Usage"} data={data.usage} period={"monthly"} color='blue' />
@@ -238,16 +299,18 @@ const QnaHistory = () => {
                         </div>
 
                         {/* Sticky CHATS Header */}
-                        <div className="shadow-md bg-white py-2 rounded-md px-2 sticky top-0 z-10">
-                            <h1 className="font-bold text-2xl relative inline-block">
+                        <div className="shadow-sm bg-gray-100 py-2 rounded-md px-2 sticky top-12 z-10 border-b-2 border-solid border-primary">
+                            <h1 className="font-bold text-md relative inline-block">
                                 CHATS
-                                <div className="h-[2px] bg-primary w-[80%] mt-1 mx-auto"></div>
+                                {/* <div className="h-[2px] bg-primary w-[80%] mt-1 mx-auto"></div> */}
                             </h1>
                         </div>
 
                         {/* Scrollable Chat Messages */}
                         <div className="flex-1 bg-white p-2">
                             {data.chatData.map((item, idx) => (
+                                // {DUMMY_CHAT.map((item, idx) => (
+
                                 <ChatMessage
                                     key={idx}
                                     type={item.sender}

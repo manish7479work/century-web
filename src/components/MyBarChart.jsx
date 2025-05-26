@@ -9,7 +9,7 @@ import {
     ResponsiveContainer,
 } from "recharts"
 
-const MyBarChart = ({ title, data = [], color = "#E30613" }) => {
+const MyBarChart = ({ title, data = [], color = "#E30613", interval = 2 }) => {
     return (
         <div className="p-4 bg-white w-full rounded-md shadow-sm border-2 border-solid">
             <div className="flex justify-between items-center mb-4">
@@ -20,7 +20,7 @@ const MyBarChart = ({ title, data = [], color = "#E30613" }) => {
                     <BarChart data={data}>
                         <CartesianGrid strokeDasharray="1" />
                         {/* <XAxis dataKey="name" /> */}
-                        <XAxis dataKey="name" interval={2} />
+                        <XAxis dataKey="name" interval={interval} />
                         <YAxis //domain={[0, yAxisMax]}
                             // tickFormatter={(tick) => Math.floor(tick)}
                             allowDecimals={false} />

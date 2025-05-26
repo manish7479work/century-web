@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import MyDataGrid from '../components/Form/MyDataGrid';
 import MyModel from '../components/MyModel';
 import { USER_CHAT_DATA } from '../data';
-import { convertToISO, extractColumns, fillMonthlyData, fillYearlyData, getMonthDateRange, getMonthsToJanuary, isDateRangeWithInTheTarget, } from '../utils/helper';
+import { convertToISO, extractColumns, fillMonthlyData, fillYearlyData, getMonthDateRange, getMonthsToJanuary, isDateRangeWithInTheTarget, isSameMonth, mapCountsToDateRange, mapDailyTotalsInRange, } from '../utils/helper';
 import MyChat from '../components/MyChat';
 import Breadcrumbs from '../components/Breadcrumb/Breadcrumb';
 import KPI from '../components/KPI';
@@ -42,6 +42,8 @@ const Overview = () => {
     const [loading, setLoading] = useState(true)
     const phone = sessionStorage.getItem(AUTH.PHONE)
     const [isDisableDropdown, setIsDisableDropdown] = useState(false)
+    const targetDays = 60;
+
 
     const fetchInitialData = async () => {
         if (dateRange.length > 0 && dateRange[0]) return;
@@ -54,7 +56,7 @@ const Overview = () => {
         let end_time = null;
 
         if (period != "Last 24 Hours" || !period) {
-            const dateRange = getMonthDateRange(period)
+            const dateRange = getMonthDateRange(period) // get date range for the selected month start_date and end_date
             start_time = dateRange.start_date;
             end_time = dateRange.end_date
         }
@@ -84,9 +86,11 @@ const Overview = () => {
 
 
             const { data } = await axiosInstance.post("/get_all_overview_data", bodyData)
-            const usageData = period === "daily" ? fillMonthlyData(data.data.usage) : fillYearlyData(data.data.usage)
-            const uniqueVisitorData = period === "daily" ? fillMonthlyData(data.data.unique_users) : fillYearlyData(data.data.unique_users)
-            const errorRateData = period === "daily" ? fillMonthlyData(data.data.error_data) : fillYearlyData(data.data.error_data)
+
+            const mode = data?.data?.mode
+            const usageData = mode === "daily" ? fillMonthlyData(data.data.usage) : fillYearlyData(data.data.usage)
+            const uniqueVisitorData = mode === "daily" ? fillMonthlyData(data.data.unique_users) : fillYearlyData(data.data.unique_users)
+            const errorRateData = mode === "daily" ? fillMonthlyData(data.data.error_data) : fillYearlyData(data.data.error_data)
 
             setDATA(prev => ({
                 ...prev,
@@ -114,7 +118,6 @@ const Overview = () => {
         }
     }
 
-
     // fetch data
     useEffect(() => {
         fetchInitialData()
@@ -123,7 +126,7 @@ const Overview = () => {
     const fetchDataOnDateRange = async () => {
         try {
             setLoading(true)
-            const URL = "/overview_timerange_data"
+            const URL = "/get_all_overview_data"
             let start_time = null;
             let end_time = null;
             if (dateRange.length > 0 && dateRange[0]) {
@@ -133,8 +136,9 @@ const Overview = () => {
                 const endDate = new Date(dateRange[1]);
                 endDate.setDate(endDate.getDate() + 1);
                 end_time = convertToISO(endDate);
-                const targetDay = 30
-                const mode = isDateRangeWithInTheTarget(start_time, end_time, targetDay) ? "daily" : "monthly"
+
+
+                // const mode = (isDateRangeWithInTheTarget(start_time, end_time, targetDays + 1)) ? "daily" : "monthly";
 
                 const bodyData = {
                     "pno": String(phone),
@@ -145,19 +149,13 @@ const Overview = () => {
                 };
                 const { data } = await axiosInstance.post(URL, bodyData)
 
-                // const usageData = fillYearlyData(data?.data?.usage)
-                // const uniqueVisitorData = fillYearlyData(data?.data?.unique_user)
-                // const errorRateData = fillYearlyData(data?.data?.error_data)
+                const mode = data?.data?.mode
 
-                const usageData = mode === "daily" ? fillMonthlyData(data?.data?.usage) : fillYearlyData(data?.data?.usage)
-                const uniqueVisitorData = mode === "daily" ? fillMonthlyData(data?.data?.usage) : fillYearlyData(data?.data?.unique_user)
-                const errorRateData = mode === "daily" ? fillMonthlyData(data?.data?.error_data) : fillYearlyData(data?.data?.error_data)
+                const usageData = mode === "daily" ? mapDailyTotalsInRange(start_time, end_time, data?.data?.usage) : fillYearlyData(data?.data?.usage)
+                const uniqueVisitorData = mode === "daily" ? mapDailyTotalsInRange(start_time, end_time, data?.data?.unique_users) : fillYearlyData(data?.data?.unique_users)
+                const errorRateData = mode === "daily" ? mapDailyTotalsInRange(start_time, end_time, data?.data?.error_data) : fillYearlyData(data?.data?.error_data)
 
-
-                // console.log(data.data)
-                // console.log(uniqueVisitorData)
-                // console.log(usageData)
-                // console.log(errorRateData)
+                console.log(usageData)
 
                 setDATA(prev => ({
                     ...prev,
@@ -190,8 +188,6 @@ const Overview = () => {
 
     useEffect(() => {
         setPeriod(options[0].value)
-        // setPeriod("daily")
-
     }, [dateRange])
 
     // enable/disalbe dropdown 
@@ -204,6 +200,7 @@ const Overview = () => {
         }
 
     }, [dateRange])
+
 
     // const options = (initialOptions && initialOptions.length > 0)
     //     && initialOptions.map((record) => ({ label: record.month, value: record.number }))
@@ -229,7 +226,7 @@ const Overview = () => {
                 <Breadcrumbs />
                 <Filter options={options} selectedOption={selectedOption} setPeriod={setPeriod} setDateRange={setDateRange} isDisableDropdown={isDisableDropdown} />
                 <div className='flex gap-2'>
-                    <MyBarChart title={"Usage"} data={DATA.usage} period={period} color='blue' />
+                    <MyBarChart title={"Usage"} data={DATA.usage} period={period} color='blue' interval={10} />
                     <MyBarChart title={"Unique Visitor"} data={DATA.uniqueVisitor} period={period} color='green' />
                     <MyBarChart title={"Error Rate"} data={DATA.errorRate} period={period} />
 
