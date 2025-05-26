@@ -98,11 +98,14 @@ const QnaHistory = () => {
             if (!effectivePno) return;
 
             // Cache PNO for consistent reference to avoid re-runs
-            if (!initialPnoRef.current) {
+            if (initialPnoRef.current) {
                 initialPnoRef.current = effectivePno;
             }
 
             let period = "daily";
+
+            console.log(initialPnoRef)
+
 
             try {
                 setLoading(true);
@@ -125,7 +128,9 @@ const QnaHistory = () => {
                 }
 
                 const bodyData = {
-                    pno: initialPnoRef.current,
+                    // pno: initialPnoRef.current,
+                    pno: effectivePno,
+
                     uid: "c9b1a069-2e1e-4138-adac-b7935e769ac6", // Replace with dynamic UID if possible
                     start_time,
                     end_time,
