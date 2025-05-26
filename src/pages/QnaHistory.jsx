@@ -316,6 +316,38 @@ const QnaHistory = () => {
 export default QnaHistory;
 
 
+
+
+// const Filter = ({ options, selectedOption, setName, setDateRange }) => {
+//     return (
+//         <div className='w-full flex gap-2'>
+//             <Select
+//                 isMulti={false}
+//                 value={selectedOption}
+//                 onChange={(selectedOption) => {
+//                     const selectedValue = selectedOption?.value || "";
+//                     setName(selectedValue);
+//                 }}
+//                 closeMenuOnSelect={true}
+//                 placeholder="Select Name"
+//                 className="basic-multi-select w-full"
+//                 classNamePrefix="select"
+//                 options={options}
+//                 isClearable={true}
+//             />
+//             <div className='w-[550px] '>
+//                 <MyDatePicker disabled={!selectedOption} setDateRange={setDateRange} />
+//             </div>
+//         </div>
+//     )
+// }
+
+// import Select from 'react-select';
+
+const customStyles = {
+    menuPortal: (base) => ({ ...base, zIndex: 9999 }), // High z-index for the dropdown
+};
+
 const Filter = ({ options, selectedOption, setName, setDateRange }) => {
     return (
         <div className='w-full flex gap-2'>
@@ -332,11 +364,14 @@ const Filter = ({ options, selectedOption, setName, setDateRange }) => {
                 classNamePrefix="select"
                 options={options}
                 isClearable={true}
+                menuPortalTarget={document.body} // Renders menu to the body
+                styles={customStyles} // Apply custom z-index
             />
             <div className='w-[550px] '>
                 <MyDatePicker disabled={!selectedOption} setDateRange={setDateRange} />
             </div>
         </div>
-    )
-}
+    );
+};
+
 
