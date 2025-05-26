@@ -77,8 +77,13 @@ const LoginPage = () => {
       try {
         data = await getAccessToken(response?.accessToken, phone);
       } catch (tokenErr) {
+        const statusCode = tokenErr.response?.status;
+        if (statusCode === 403) {
+          toast.error("Access denied. Please check your permissions.");
+        } else {
+          toast.error("Login failed. Please check your credentials and try again.");
+        }
         console.error("Token fetch failed:", tokenErr);
-        toast.error("Failed to retrieve token. Please try again.");
         return;
       }
 
