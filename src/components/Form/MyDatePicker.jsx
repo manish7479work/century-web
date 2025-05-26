@@ -24,6 +24,7 @@ const MyDatePicker = ({ setDateRange = () => { }, disabled = false }) => {
             }}
             disabledDate={disabledDate}
             disabled={disabled}
+            allowEmpty={[true, true]} // Add this line to silence the warning
         />
     )
 }
