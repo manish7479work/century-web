@@ -37,12 +37,12 @@ const ChatMessage = ({ type, text, timestamp = null, feedback = null }) => {
                             h2: ({ node, ...props }) => <h2 className="text-xl font-semibold mt-3 mb-2 font-helvetica" {...props} />,
                             h3: ({ node, ...props }) => <h3 className="text-lg font-medium mt-2 mb-1 font-helvetica" {...props} />,
                             // ...add more as needed
-                            p: ({ node, ...props }) => <p className="text-black" {...props} />,
-                            li: ({ node, ...props }) => <li className="text-black" {...props} />,
-                            strong: ({ node, ...props }) => <strong className="text-black" {...props} />,
-                            em: ({ node, ...props }) => <em className="text-black" {...props} />,
-                            blockquote: ({ node, ...props }) => <blockquote className="text-black border-l-4 pl-4 italic" {...props} />,
-                            code: ({ node, ...props }) => <code className="text-black bg-gray-200 px-1 rounded" {...props} />,
+                            // p: ({ node, ...props }) => <p className="text-black" {...props} />,
+                            // li: ({ node, ...props }) => <li className="text-black" {...props} />,
+                            // strong: ({ node, ...props }) => <strong className="text-black" {...props} />,
+                            // em: ({ node, ...props }) => <em className="text-black" {...props} />,
+                            // blockquote: ({ node, ...props }) => <blockquote className="text-black border-l-4 pl-4 italic" {...props} />,
+                            // code: ({ node, ...props }) => <code className="text-black bg-gray-200 px-1 rounded" {...props} />,
                             hr: () => <hr className="border-black my-2" />,
                         }}
                     >
