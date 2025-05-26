@@ -40,10 +40,8 @@ const LoginPage = () => {
     const URL = "login"
     const bodyData = {
       ms_access_token: ms_acceess_token,
-      pno: phone,
-      "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
     }
-    const { data } = await axiosInstance.post(URL, bodyData);
+    const { data } = await axiosInstance.post(URL, bodyData,);
     // console.log(data)
     return data;
 
@@ -51,16 +49,16 @@ const LoginPage = () => {
 
   const handleSignIn = async () => {
     try {
-      if (!phone) {
-        toast.warning("Phone Number is required");
-        return;
-      }
+      // if (!phone) {
+      //   toast.warning("Phone Number is required");
+      //   return;
+      // }
 
-      const digits = String(phone).replace(/\D/g, '');
-      if (digits.length !== 10) {
-        toast.warning("Phone Number must be exactly 10 digits");
-        return;
-      }
+      // const digits = String(phone).replace(/\D/g, '');
+      // if (digits.length !== 10) {
+      //   toast.warning("Phone Number must be exactly 10 digits");
+      //   return;
+      // }
 
       setLoading(true);
 
@@ -79,8 +77,13 @@ const LoginPage = () => {
       try {
         data = await getAccessToken(response?.accessToken, phone);
       } catch (tokenErr) {
+        const statusCode = tokenErr.response?.status;
+        if (statusCode === 403) {
+          toast.error("Access denied. Please check your permissions.");
+        } else {
+          toast.error("Login failed. Please check your credentials and try again.");
+        }
         console.error("Token fetch failed:", tokenErr);
-        toast.error("Failed to retrieve token. Please try again.");
         return;
       }
 
@@ -164,7 +167,7 @@ function LoginTemplate({ handleSignIn, phone, setPhone = () => { } }) {
           Use your CenturyPly Email Account
         </p>
 
-        <Input
+        {/* <Input
           placeholder="Enter Your Register Phone No."
           variant="outlined"
           className="w-[350px] mx-auto "
@@ -172,7 +175,7 @@ function LoginTemplate({ handleSignIn, phone, setPhone = () => { } }) {
           type="number"
           sx={{ padding: "8px" }}
         // value={phone}
-        />
+        /> */}
 
         {/* Login Button */}
         <div >

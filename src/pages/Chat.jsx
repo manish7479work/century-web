@@ -10,6 +10,7 @@ import Breadcrumbs from "../components/Breadcrumb/Breadcrumb";
 import Loading from "../components/Loading";
 import { useSelector } from "react-redux";
 import { AUTH } from "../constants";
+import ChatMessage from "../components/ChatMessage";
 
 // Extend dayjs
 dayjs.extend(relativeTime);
@@ -104,34 +105,27 @@ const Chat = ({ readOnly = false }) => {
     }, [chatData, fetchChat]);
 
     return (
-        <div className="flex flex-col h-full w-full gap-1">
+        <div className="flex flex-col h-full w-full gap-1 overflow-y-auto">
             {loading && <Loading />}
             {!readOnly && (<Breadcrumbs />)}
             {/* <hr /> */}
 
             <div className="h-full overflow-y-auto bg-white  p-2">
-                {chatData.length > 0 ? (
-                    <>
-                        {chatData.map((item, idx) => (
-                            <ChatMessage
-                                key={idx}
-                                type={item.sender}
-                                text={item.message}
-                                timestamp={item.timestamp}
-                            />
-                        ))}
-                        {fetchChat && <ChatLoader />}
-                    </>
-                ) : (
-                    <Alert severity="warning">No Chat Found.</Alert>
-                )}
 
-
+                {chatData.map((item, idx) => (
+                    <ChatMessage
+                        key={idx}
+                        type={item.sender}
+                        text={item.message}
+                    // timestamp={item.timestamp}
+                    />
+                ))}
+                {fetchChat && <ChatLoader />}
 
                 <div ref={bottomRef} />
 
-                <PromptField readOnly={readOnly} handleSubmit={handleSubmit} prompt={prompt} setPrompt={setPrompt} />
             </div>
+            <PromptField readOnly={readOnly} handleSubmit={handleSubmit} prompt={prompt} setPrompt={setPrompt} />
         </div>
     );
 };
@@ -159,37 +153,37 @@ const PromptField = ({ readOnly, handleSubmit, prompt, setPrompt }) => {
     )
 }
 
-import { MarkdownHooks } from 'react-markdown'
-const ChatMessage = ({ type, text, timestamp }) => {
-    const isUser = type === "user";
-    const Icon = isUser ? FaUser : FaRobot;
-    const parsedText = text.split(/\*\*(.*?)\*\*/g); // parse **bold**
+// import { MarkdownHooks } from 'react-markdown'
+// const ChatMessage = ({ type, text, timestamp }) => {
+//     const isUser = type === "user";
+//     const Icon = isUser ? FaUser : FaRobot;
+//     const parsedText = text.split(/\*\*(.*?)\*\*/g); // parse **bold**
 
-    return (
-        <div className={`flex items-start ${isUser ? "justify-end" : "justify-start"} mb-4`}>
-            {!isUser && (
-                <div className="mr-2 mt-1 text-gray-500">
-                    <Icon />
-                </div>
-            )}
-            <div>
-                <div
-                    className={`px-4 py-3 rounded-lg max-w-xl text-sm shadow 
-                    ${isUser ? "bg-blue-100 text-gray-900" : "bg-gray-100 text-gray-800"}`}
-                >
-                    <MarkdownHooks>{text}</MarkdownHooks>
-                    {/* {text} */}
-                </div>
+//     return (
+//         <div className={`flex items-start ${isUser ? "justify-end" : "justify-start"} mb-4`}>
+//             {!isUser && (
+//                 <div className="mr-2 mt-1 text-gray-500">
+//                     <Icon />
+//                 </div>
+//             )}
+//             <div>
+//                 <div
+//                     className={`px-4 py-3 rounded-lg max-w-xl text-sm shadow 
+//                     ${isUser ? "bg-blue-100 text-gray-900" : "bg-gray-100 text-gray-800"}`}
+//                 >
+//                     <MarkdownHooks>{text}</MarkdownHooks>
+//                     {/* {text} */}
+//                 </div>
 
-            </div>
-            {isUser && (
-                <div className="ml-2 mt-1 text-gray-500">
-                    <Icon />
-                </div>
-            )}
-        </div>
-    );
-};
+//             </div>
+//             {isUser && (
+//                 <div className="ml-2 mt-1 text-gray-500">
+//                     <Icon />
+//                 </div>
+//             )}
+//         </div>
+//     );
+// };
 
 
 
