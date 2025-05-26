@@ -1,6 +1,6 @@
 import { DatePicker } from 'antd';
 
-const MyDatePicker = ({ setDateRange = () => { } }) => {
+const MyDatePicker = ({ setDateRange = () => { }, disabled = false }) => {
     return (
         <DatePicker.RangePicker
             className="custom-range-picker font-medium text-geeen-100 p-2 rounded-md border-gray-300 hover:border-blue-500 w-full"
@@ -8,6 +8,7 @@ const MyDatePicker = ({ setDateRange = () => { } }) => {
             onChange={(date, dateString) => {
                 setDateRange(dateString);
             }}
+            disabled={disabled}
         />
     )
 }

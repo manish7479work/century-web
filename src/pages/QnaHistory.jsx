@@ -40,6 +40,7 @@ const QnaHistory = () => {
     const [data, setData] = useState(initialData)
     const PNO = useParams().pno;
     const bottomRef = useRef(null);
+    const [interval, setInterval] = useState(2);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -86,68 +87,6 @@ const QnaHistory = () => {
         })();
     }, []);
 
-    // fetch data on the basis of pno
-    // useEffect(() => {
-    //     (async () => {
-    //         const URL = "/get_user_analytics";
-    //         if (!PNO && !selectedData) return
-    //         // if (!phoneNumber) return
-
-    //         let period = "daily"
-
-    //         try {
-    //             setLoading(true);
-    //             let start_time = null;
-    //             let end_time = null;
-
-    //             if (dateRange.length > 0 && dateRange[0]) {
-    //                 start_time = convertToISO(dateRange[0]);
-
-    //                 // const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-    //                 period = isDateRangeWithInTheTarget(start_time, end_time, daysInCurrentMonth) ? "daily" : "monthly"
-
-    //                 // Add one day to dateRange[1]
-    //                 const endDate = new Date(dateRange[1]);
-    //                 endDate.setDate(endDate.getDate() + 1);
-    //                 end_time = convertToISO(endDate);
-    //             }
-    //             const bodyData = {
-    //                 "pno": PNO ?? selectedData.pno,
-    //                 "uid": "c9b1a069-2e1e-4138-adac-b7935e769ac6",
-    //                 start_time,
-    //                 end_time,
-    //             };
-
-    //             const { data } = await axiosInstance.post(URL, bodyData);
-
-    //             const usageData = period === "daily" ? fillMonthlyData(data.analytics_data.usage) : fillYearlyData(data.analytics_data.usage)
-    //             const errorRateData = period === "daily" ? fillMonthlyData(data.analytics_data.error_data) : fillYearlyData(data.analytics_data.error_data)
-    //             // const uniqueVisitorData = period === "daily" ? fillMonthlyData(uniqueVisitors?.data.unique_users_data) : fillYearlyData(uniqueVisitors?.data.unique_users_data)
-
-    //             setData(prev => ({
-    //                 ...prev,
-    //                 usage: usageData.map(item => ({
-    //                     name: item.name,
-    //                     Usage: item.count
-    //                 })),
-    //                 average: [],
-    //                 errorRate: errorRateData.map(item => ({
-    //                     name: item.name,
-    //                     "Error Rate": item.count
-    //                 })),
-    //                 chatData: data.chat_data
-    //             }));
-
-    //             setSelectedData(data.user_data)
-
-    //         } catch (error) {
-    //             console.error(error);
-    //             toast.error("Someting went wrong")
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     })();
-    // }, [PNO, selectedData, dateRange]);
 
     const initialPnoRef = useRef(null);
 
@@ -176,9 +115,13 @@ const QnaHistory = () => {
                     endDate.setDate(endDate.getDate() + 1);
                     end_time = convertToISO(endDate);
 
-                    const sameMonth = isSameMonth(start_time, end_time - 1);
                     const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-                    period = (isDateRangeWithInTheTarget(start_time, end_time, daysInCurrentMonth + 1) && sameMonth) ? "daily" : "monthly";
+                    period = isDateRangeWithInTheTarget(start_time, end_time, daysInCurrentMonth + 1)
+                    if (!period) {
+                        setInterval(5)
+                    } else {
+                        setInterval(2);
+                    }
                 }
 
                 const bodyData = {
@@ -292,10 +235,10 @@ const QnaHistory = () => {
                         </div>
                         {/* Bar charts container (non-sticky) */}
                         <div className="flex gap-2 ">
-                            <MyBarChart title={"Usage"} data={data.usage} period={"monthly"} color='blue' />
-                            <MyBarChart title={"Average"} data={data.average} period={"monthly"} color='green' />
+                            <MyBarChart title={"Usage"} data={data.usage} period={"monthly"} color='blue' interval={interval} />
+                            <MyBarChart title={"Average"} data={data.average} period={"monthly"} color='green' interval={interval} />
                             {/* <BasicLineChart /> */}
-                            <MyBarChart title={"Error Rate"} data={data.errorRate} period={"monthly"} />
+                            <MyBarChart title={"Error Rate"} data={data.errorRate} period={"monthly"} interval={interval} />
                         </div>
 
                         {/* Sticky CHATS Header */}
@@ -390,8 +333,8 @@ const Filter = ({ options, selectedOption, setName, setDateRange }) => {
                 options={options}
                 isClearable={true}
             />
-            <div className='w-[550px]'>
-                <MyDatePicker setDateRange={setDateRange} />
+            <div className='w-[550px] '>
+                <MyDatePicker disabled={!selectedOption} setDateRange={setDateRange} />
             </div>
         </div>
     )

@@ -42,6 +42,7 @@ const Overview = () => {
     const [loading, setLoading] = useState(true)
     const phone = sessionStorage.getItem(AUTH.PHONE)
     const [isDisableDropdown, setIsDisableDropdown] = useState(false)
+    const [interval, setInterval] = useState(2); // default interval for daily data
     const targetDays = 60;
 
 
@@ -139,6 +140,13 @@ const Overview = () => {
 
 
                 // const mode = (isDateRangeWithInTheTarget(start_time, end_time, targetDays + 1)) ? "daily" : "monthly";
+                const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+                const check = isDateRangeWithInTheTarget(start_time, end_time, daysInCurrentMonth + 1)
+                if (!check) {
+                    setInterval(5)
+                } else {
+                    setInterval(2);
+                }
 
                 const bodyData = {
                     "pno": String(phone),
@@ -226,9 +234,9 @@ const Overview = () => {
                 <Breadcrumbs />
                 <Filter options={options} selectedOption={selectedOption} setPeriod={setPeriod} setDateRange={setDateRange} isDisableDropdown={isDisableDropdown} />
                 <div className='flex gap-2'>
-                    <MyBarChart title={"Usage"} data={DATA.usage} period={period} color='blue' interval={10} />
-                    <MyBarChart title={"Unique Visitor"} data={DATA.uniqueVisitor} period={period} color='green' />
-                    <MyBarChart title={"Error Rate"} data={DATA.errorRate} period={period} />
+                    <MyBarChart title={"Usage"} data={DATA.usage} period={period} color='blue' interval={interval} />
+                    <MyBarChart title={"Unique Visitor"} data={DATA.uniqueVisitor} period={period} color='green' interval={interval} />
+                    <MyBarChart title={"Error Rate"} data={DATA.errorRate} period={period} interval={interval} />
 
                 </div>
                 <div className='h-full overflow-auto'>
@@ -317,7 +325,7 @@ const Filter = ({ options = [], selectedOption = () => { }, setPeriod = () => { 
                     setPeriod(selectedValue);
                 }}
                 closeMenuOnSelect={true}
-                placeholder="Select Month"
+                placeholder={selectedOption?.label || ""}
                 className="basic-multi-select w-full"
                 classNamePrefix="select"
                 options={options}
