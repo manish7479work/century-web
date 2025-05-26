@@ -18,6 +18,7 @@ import MyBarChart from '../components/MyBarChart';
 import BasicLineChart from '../components/BasicLineChat';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Alert } from '@mui/material';
 
 dayjs.extend(isBetween);
 
@@ -53,7 +54,7 @@ const QnaHistory = () => {
     // fetch last 24 hours, user details that access the application
     useEffect(() => {
         (async () => {
-            const URL = "/get_history_overview";
+            const URL = "/get_users_for_qna_analytics";
             if (PNO) return
             try {
                 setLoading(true);
@@ -78,7 +79,7 @@ const QnaHistory = () => {
                 };
 
                 const { data } = await axiosInstance.post(URL, bodyData);
-                setUsers(data.history_data);
+                setUsers(data.data);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -103,9 +104,6 @@ const QnaHistory = () => {
             }
 
             // let period = "daily";
-
-            console.log(initialPnoRef)
-
 
             try {
                 setLoading(true);
@@ -224,6 +222,12 @@ const QnaHistory = () => {
                 setDateRange={setDateRange}
             />}
 
+            {
+                // !selectedData && <Alert severity="info">Please select a name from the dropdown to view details.</Alert>
+                !selectedData && <Alert severity="info"> Pick a name from the dropdown menu to view the corresponding details.</Alert>
+
+            }
+
 
             {/* This part takes remaining space and scrolls */}
             {
@@ -245,7 +249,7 @@ const QnaHistory = () => {
                         {/* Bar charts container (non-sticky) */}
                         <div className="flex gap-2 ">
                             <MyBarChart title={"Usage"} data={data.usage} period={"monthly"} color='blue' interval={interval} />
-                            <MyBarChart title={"Average"} data={data.average} period={"monthly"} color='green' interval={interval} />
+                            {/* <MyBarChart title={"Average"} data={data.average} period={"monthly"} color='green' interval={interval} /> */}
                             {/* <BasicLineChart /> */}
                             <MyBarChart title={"Error Rate"} data={data.errorRate} period={"monthly"} interval={interval} />
                         </div>
