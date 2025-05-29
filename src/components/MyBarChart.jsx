@@ -38,13 +38,13 @@ const MyBarChart = ({ title, data = [], color = "#E30613", interval = 2 }) => {
 
                         <YAxis
                             allowDecimals={false}
-                            label={{
-                                value: 'Y-Axis Label',
-                                angle: -90,
-                                position: 'outsideLeft',
-                                // offset: 30, // Increase this value to push the label more to the left
+                        // label={{
+                        //     value: 'Y-Axis Label',
+                        //     angle: -90,
+                        //     position: 'outsideLeft',
+                        //     // offset: 30, // Increase this value to push the label more to the left
 
-                            }}
+                        // }}
                         />
 
                         <Tooltip />
