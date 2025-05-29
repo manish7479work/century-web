@@ -21,7 +21,7 @@ const MyBarChart = ({ title, data = [], color = "#E30613", interval = 2 }) => {
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={data}
-                        margin={{ top: 5, right: 10, left: 10, bottom: 20 }} // Adds spacing inside the chart
+                        margin={{ top: 5, right: 10, left: 0, bottom: 20 }} // Adds spacing inside the chart
                     >
                         <CartesianGrid strokeDasharray="1" />
 
@@ -32,7 +32,7 @@ const MyBarChart = ({ title, data = [], color = "#E30613", interval = 2 }) => {
                                 value: titleValue,
                                 position: 'insideBottom',
                                 offset: -15, // Lower this to push label farther from legend
-                                className: 'text-md font-semibold',
+                                className: '',
                             }}
                         />
 
