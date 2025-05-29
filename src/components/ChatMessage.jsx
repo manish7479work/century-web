@@ -55,7 +55,7 @@ const ChatMessage = ({ type, text, timestamp = null, feedback = null }) => {
                 </div>
                 {timestamp && (
                     <div className="text-sm text-gray-600 mt-2 text-right">
-                        {timestamp}
+                        {dayjs(timestamp).format('MMMM D, YYYY [at] hh:mm:ss A')}
                     </div>
                 )}
                 {feedback && (
